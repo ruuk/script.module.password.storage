@@ -23,9 +23,6 @@ def ERROR(msg):
 	import traceback
 	traceback.print_exc()
 
-addonid = xbmcaddon.Addon().getAddonInfo('id')
-SERVICE_NAME = 'PasswordStorage_%s' % addonid.replace('.','_') 
-
 encrypted = True
 
 def __keyringFallback():
@@ -50,7 +47,17 @@ else:
 		ERROR('Keyring failed test - using fallback keyring')
 		__keyringFallback()
 	
-LOG('Backend: %s' % str(keyring.get_keyring()))
+def getKeyringName():
+	kr = keyring.get_keyring()
+	try:
+		mod = kr.__module__.rsplit('.',1)[-1]
+		cls = kr.__class__.__name__
+		return mod + '.' + cls
+	except:
+		return str(kr).strip('<>').split(' ')[0]
+
+LOG('Backend: %s' % getKeyringName())
+
 
 def retrieve(username):
 	try:
@@ -74,3 +81,15 @@ def store(username,password):
 	except:
 		ERROR('Failed to save password to keyring')
 	return False
+
+def setAddonID(ID):
+	global SERVICE_NAME, ADDON_ID
+	ADDON_ID = ID
+	SERVICE_NAME = 'PasswordStorage_%s' % ADDON_ID.replace('.','_')
+	
+ADDON_ID = None
+SERVICE_NAME = None
+
+setAddonID(xbmcaddon.Addon().getAddonInfo('id'))
+
+ 
