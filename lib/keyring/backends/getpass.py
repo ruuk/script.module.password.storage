@@ -12,6 +12,10 @@ def getpass(prompt='Enter Password:'):
 
 def getKeyringPass():
 	password = xbmcgui.Window(10000).getProperty('KEYRING_password') or ''
+	if not password:
+		import xbmcaddon
+		import binascii
+		password = binascii.unhexlify(xbmcaddon.Addon('script.module.password.storage').getSetting('keyring_password') or '')
 	return password
 	
 def saveKeyringPass(password):

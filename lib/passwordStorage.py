@@ -9,29 +9,32 @@ def new_syscmd_uname(option,default=''):
 		return default
 platform._syscmd_uname = new_syscmd_uname
 
-from keyring.backends import getpass # @UnusedImport
 import keyring
+from keyring.backends import getpass # @UnusedImport
 
 DEBUG = True
+LAST_ERROR = ''
 
 def LOG(msg):
 	xbmc.log('script.module.password.storage: ' + msg)
 	
 def ERROR(msg):
 	LOG('ERROR: ' + msg)
-	if not DEBUG: return
 	import traceback
+	global LAST_ERROR
+	LAST_ERROR = traceback.format_exc()
+	if not DEBUG:
+		return
 	traceback.print_exc()
 
 encrypted = True
 
 def __keyringFallback():
-	from keyring import backends
-	cryptedKeyring = backends.file.EncryptedKeyring()
-	if cryptedKeyring.supported() > -1:
+	cryptedKeyring = keyring.backends.file.EncryptedKeyring()  # @UndefinedVariable
+	if cryptedKeyring.viable:
 		keyring.set_keyring(cryptedKeyring)
 	else:
-		keyring.set_keyring(backends.file.PlaintextKeyring)
+		keyring.set_keyring(keyring.backends.file.PlaintextKeyring)  # @UndefinedVariable
 		global encrypted
 		LOG('Using un-encrypted keyring')
 		encrypted = False

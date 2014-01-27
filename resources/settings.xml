@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+	<category label="Main">
+		<setting label="Keyring Password (SETTING THIS IS INSECURE)" type="action" id="keyring_password" default="" option="hidden" action="RunScript(script.module.password.storage,keyring_password)"/>
+	</category>
+</settings>
