@@ -17,10 +17,14 @@ class EnhancedEncryptedKeyring(backends.file.EncryptedKeyring):
 			if section != 'keyring-setting':
 				sections[section] = {}
 				pct=0
-				for name,password in config.items(section):
-					name = util.escape.unescape(name)
-					sections[section][name] = keyring.get_password(section,name)
-					pct+=1
+				try:
+					for name,password in config.items(section):
+						name = util.escape.unescape(name)
+						sections[section][name] = keyring.get_password(section,name)
+						pct+=1
+				except configparser.NoSectionError:
+					LOG('Skipping broken section: %s' % section)
+					
 				LOG('Loaded section: %s (%s passwords)' % (section,pct))
 		self._init_file()
 		LOG('Changed keyring password')
