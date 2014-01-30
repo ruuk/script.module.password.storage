@@ -1,7 +1,8 @@
 import keyring
 from keyring import backends, util
 from keyring.py27compat import configparser
-import xbmc
+import xbmc, sys
+import getpass
 
 def LOG(msg):
 	xbmc.log('script.module.password.storage: ' + msg)
@@ -49,5 +50,18 @@ class EnhancedEncryptedKeyring(backends.file.EncryptedKeyring):
 		
 		LOG('EnhancedEncryptedKeyring: change_password() - END')
 		return self.keyring_key
+	
+	def _get_new_password(self):
+		while True:
+			password = getpass.getpass("Please set a password for your new keyring: ",force=True)
+			confirm = getpass.getpass('Please confirm the password: ',force=True)
+			if password != confirm:
+				sys.stderr.write("Error: Your passwords didn't match\n")
+				continue
+			if '' == password.strip():
+				# forbid the blank password
+				sys.stderr.write("Error: blank passwords aren't allowed.\n")
+				continue
+			return password
 		
 		
