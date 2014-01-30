@@ -18,6 +18,9 @@ def askPassword():
 	from passwordStorage import keyring# @UnresolvedImport
 	kr = keyring.get_keyring()
 	if hasattr(kr,'change_keyring_password'):
+		xbmcgui.Window(10000).setProperty('KEYRING_password','')
+		xbmcaddon.Addon('script.module.password.storage').setSetting('keyring_password','')
+		
 		password = kr.change_keyring_password()
 		import binascii
 		xbmcaddon.Addon().setSetting('keyring_password',binascii.hexlify(password))
