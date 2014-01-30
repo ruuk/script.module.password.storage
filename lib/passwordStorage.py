@@ -10,7 +10,7 @@ def new_syscmd_uname(option,default=''):
 platform._syscmd_uname = new_syscmd_uname
 
 import keyring
-from keyring.backends import getpass # @UnusedImport
+from lib import getpass # @UnusedImport
 
 DEBUG = True
 LAST_ERROR = ''
@@ -30,7 +30,8 @@ def ERROR(msg):
 encrypted = True
 
 def __keyringFallback():
-	cryptedKeyring = keyring.backends.file.EncryptedKeyring()  # @UndefinedVariable
+	import keyringUtils
+	cryptedKeyring = keyringUtils.EnhancedEncryptedKeyring()  # @UndefinedVariable
 	if cryptedKeyring.viable:
 		keyring.set_keyring(cryptedKeyring)
 	else:
@@ -39,16 +40,16 @@ def __keyringFallback():
 		LOG('Using un-encrypted keyring')
 		encrypted = False
 		
-if xbmc.getCondVisibility('System.Platform.Darwin') or xbmc.getCondVisibility('System.Platform.OSX'):
-	LOG("OSX or Darwin detected, using fallback keyring")
+# if xbmc.getCondVisibility('System.Platform.Darwin') or xbmc.getCondVisibility('System.Platform.OSX'):
+# 	LOG("OSX or Darwin detected, using fallback keyring")
+# 	__keyringFallback()
+# else:
+try:
+	keyring.set_password('PasswordStorage_TEST','TEST','test')
+	if not keyring.get_password('PasswordStorage_TEST','TEST') == 'test': raise Exception()
+except:
+	ERROR('Keyring failed test - using fallback keyring')
 	__keyringFallback()
-else:
-	try:
-		keyring.set_password('PasswordStorage_TEST','TEST','test')
-		if not keyring.get_password('PasswordStorage_TEST','TEST') == 'test': raise Exception()
-	except:
-		ERROR('Keyring failed test - using fallback keyring')
-		__keyringFallback()
 	
 def getKeyringName():
 	kr = keyring.get_keyring()

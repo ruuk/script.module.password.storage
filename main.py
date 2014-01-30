@@ -1,5 +1,4 @@
 import sys
-import passwordStorage  # @UnresolvedImport
 import xbmc, xbmcgui, xbmcaddon
 
 class MainWindow(xbmcgui.WindowXML):
@@ -16,16 +15,24 @@ class MainWindow(xbmcgui.WindowXML):
 			xbmcaddon.Addon().openSettings()
 
 def askPassword():
-	key = xbmc.Keyboard('','Enter Password',True)
-	key.doModal()
-	if not key.isConfirmed(): return
-	password = key.getText()
-	if not password: return
-	del key
+	from lib import getpass
+	while True:
+		password = getpass.getpass(force=True)
+		if not password: return
+		check = getpass.getpass('Confirm:',force=True)
+		if not check: return
+		if password != check:
+			xbmcgui.Dialog().ok('No Match','Passwords do not match.','Please try again.')
+			continue
+		break
 	import binascii
 	xbmcaddon.Addon().setSetting('keyring_password',binascii.hexlify(password))
+	import keyring
+	kr = keyring.get_keyring()
+	if hasattr(kr,'change_keyring_password'): kr.change_keyring_password(password)
 	
 def openWindow():
+	import passwordStorage  # @UnresolvedImport
 	text =	'Keyring: [COLOR FF66AAFF]%s[/COLOR][CR][CR]' % passwordStorage.getKeyringName()
 	text +=	'Uses Encrypted Storage: %s[CR][CR]' % (passwordStorage.encrypted and '[COLOR FF00FF00]Yes[/COLOR]' or '[COLOR FFFF0000]No[/COLOR]')
 	errors = ''
