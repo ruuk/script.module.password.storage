@@ -10,7 +10,7 @@ def new_syscmd_uname(option,default=''):
 platform._syscmd_uname = new_syscmd_uname
 
 import keyring
-from lib import getpass # @UnusedImport
+import getpass # @UnusedImport
 
 DEBUG = True
 LAST_ERROR = ''
