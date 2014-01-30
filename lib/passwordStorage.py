@@ -44,13 +44,7 @@ def __keyringFallback():
 # 	LOG("OSX or Darwin detected, using fallback keyring")
 # 	__keyringFallback()
 # else:
-try:
-	keyring.set_password('PasswordStorage_TEST','TEST','test')
-	if not keyring.get_password('PasswordStorage_TEST','TEST') == 'test': raise Exception()
-except:
-	ERROR('Keyring failed test - using fallback keyring')
-	__keyringFallback()
-	
+
 def getKeyringName():
 	kr = keyring.get_keyring()
 	try:
@@ -59,6 +53,17 @@ def getKeyringName():
 		return mod + '.' + cls
 	except:
 		return str(kr).strip('<>').split(' ')[0]
+	
+try:
+	keyring.set_password('PasswordStorage_TEST','TEST','test')
+	if not keyring.get_password('PasswordStorage_TEST','TEST') == 'test': raise Exception()
+	if getKeyringName() == 'file.EncryptedKeyring':
+		import keyringUtils
+		keyring.set_keyring(keyringUtils.EnhancedEncryptedKeyring())
+		
+except:
+	ERROR('Keyring failed test - using fallback keyring')
+	__keyringFallback()
 
 LOG('Backend: %s' % getKeyringName())
 
