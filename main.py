@@ -29,7 +29,10 @@ def askPassword():
 	xbmcaddon.Addon().setSetting('keyring_password',binascii.hexlify(password))
 	import keyring
 	kr = keyring.get_keyring()
-	if hasattr(kr,'change_keyring_password'): kr.change_keyring_password(password)
+	print kr
+	if hasattr(kr,'change_keyring_password'):
+		print "TEST"
+		kr.change_keyring_password(password)
 	
 def openWindow():
 	import passwordStorage  # @UnresolvedImport
