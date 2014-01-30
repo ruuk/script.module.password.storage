@@ -15,24 +15,14 @@ class MainWindow(xbmcgui.WindowXML):
 			xbmcaddon.Addon().openSettings()
 
 def askPassword():
-	from lib import getpass
-	while True:
-		password = getpass.getpass(force=True)
-		if not password: return
-		check = getpass.getpass('Confirm:',force=True)
-		if not check: return
-		if password != check:
-			xbmcgui.Dialog().ok('No Match','Passwords do not match.','Please try again.')
-			continue
-		break
-	import binascii
-	xbmcaddon.Addon().setSetting('keyring_password',binascii.hexlify(password))
 	import keyring
 	kr = keyring.get_keyring()
-	print kr
 	if hasattr(kr,'change_keyring_password'):
-		print "TEST"
-		kr.change_keyring_password(password)
+		password = kr.change_keyring_password()
+		import binascii
+		xbmcaddon.Addon().setSetting('keyring_password',binascii.hexlify(password))
+	else:
+		xbmcgui.Dialog.ok('Not Required','Keyring does not require','entering a password within XBMC.')
 	
 def openWindow():
 	import passwordStorage  # @UnresolvedImport

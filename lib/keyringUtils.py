@@ -7,7 +7,7 @@ def LOG(msg):
 	xbmc.log('script.module.password.storage: ' + msg)
 	
 class EnhancedEncryptedKeyring(backends.file.EncryptedKeyring):
-	def change_keyring_password(self,new_password):
+	def change_keyring_password(self):
 		LOG('EnhancedEncryptedKeyring: change_password() - START')
 		config = configparser.RawConfigParser()
 		config.read(self.file_path)
@@ -21,13 +21,27 @@ class EnhancedEncryptedKeyring(backends.file.EncryptedKeyring):
 					name = util.escape.unescape(name)
 					sections[section][name] = keyring.get_password(section,name)
 					pct+=1
-				LOG('Loaded section: %s (%s passwords)')
+				LOG('Loaded section: %s (%s passwords)' % (section,pct))
 		self._init_file()
 		LOG('Changed keyring password')
-		for section, items in section.items():
+		removes = []
+		for section, items in sections.items():
 			for name, password in items.items():
-				keyring.set_password(section,name,password)
+				if password:
+					keyring.set_password(section,name,password)
+				else:
+					removes.append((section,name))
 			LOG('Saved section %s' % section)
+		if removes:
+			config = configparser.RawConfigParser()
+			config.read(self.file_path)
+			for section,name in removes:
+				config.remove_option(section, name)
+			with open(self.file_path, 'w') as config_file:
+				config.write(config_file)
+			LOG('Removed %s broken entries' % len(removes))
+		
 		LOG('EnhancedEncryptedKeyring: change_password() - END')
+		return self.keyring_key
 		
 		
