@@ -1,6 +1,7 @@
 import xbmc, xbmcaddon
 
-import platform
+import platform, re
+
 original_syscmd_uname = platform._syscmd_uname
 def new_syscmd_uname(option,default=''):
 	try:
@@ -12,7 +13,24 @@ platform._syscmd_uname = new_syscmd_uname
 import keyring
 import getpass # @UnusedImport
 
-keyring.util.escape.ESCAPE_FMT = "_%02x"
+## keyring escape fix -----------------------------------
+from keyring.util import escape
+
+escape.ESCAPE_FMT = "_%02x"
+
+def unescape(value):
+	"""
+	Inverse of escape.
+	"""
+	re_esc = re.compile(
+		# the pattern must be bytes to operate on bytes
+		escape.ESCAPE_FMT.replace('%02X', '(?P<code>[0-9a-f]{2})').encode('ascii')
+	)
+	return re_esc.sub(escape._unescape_code, value.encode('ascii')).decode('utf-8')
+
+escape.unescape = unescape
+## End keyring escape fix -----------------------------------
+
 
 DEBUG = True
 LAST_ERROR = ''
