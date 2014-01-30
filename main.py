@@ -15,10 +15,9 @@ class MainWindow(xbmcgui.WindowXML):
 			xbmcaddon.Addon().openSettings()
 
 def askPassword():
-	import keyring
+	from passwordStorage import keyring# @UnresolvedImport
 	kr = keyring.get_keyring()
-	print kr
-	if getattr(kr,'change_keyring_password',None):
+	if hasattr(kr,'change_keyring_password'):
 		password = kr.change_keyring_password()
 		import binascii
 		xbmcaddon.Addon().setSetting('keyring_password',binascii.hexlify(password))
