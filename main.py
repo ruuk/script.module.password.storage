@@ -17,6 +17,7 @@ class MainWindow(xbmcgui.WindowXML):
 def askPassword():
 	import keyring
 	kr = keyring.get_keyring()
+	print kr
 	if getattr(kr,'change_keyring_password',None):
 		password = kr.change_keyring_password()
 		import binascii
