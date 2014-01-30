@@ -24,6 +24,7 @@ def askPassword():
 		password = kr.change_keyring_password()
 		import binascii
 		xbmcaddon.Addon().setSetting('keyring_password',binascii.hexlify(password))
+		xbmcgui.Window(10000).setProperty('KEYRING_password',password)
 	else:
 		xbmcgui.Dialog().ok('Not Required','Keyring does not require','entering a password within XBMC.')
 	
