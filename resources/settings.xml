@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
 	<category label="Main">
-		<setting label="Keyring Password (SETTING THIS IS INSECURE)" type="action" id="keyring_password" default="" option="hidden" action="RunScript(script.module.password.storage,keyring_password)"/>
+		<setting label="Keyring Password (SETTING THIS IS INSECURE)" type="action" default="" option="close" action="RunScript(script.module.password.storage,keyring_password)"/>
 		<setting id="use_remote_control_dialog" type="bool" label="Use Remote Control Password Entry" default="false" />
 	</category>
 </settings>
