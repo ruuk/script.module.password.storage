@@ -12,6 +12,8 @@ platform._syscmd_uname = new_syscmd_uname
 import keyring
 import getpass # @UnusedImport
 
+keyring.util.escape.ESCAPE_FMT = "_%02x"
+
 DEBUG = True
 LAST_ERROR = ''
 
