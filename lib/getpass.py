@@ -66,17 +66,18 @@ def _getpass(prompt='Enter Password:'):
 	return keyringPass
 
 def getpass(*args,**kwargs):
-	force = kwargs.get('force')
-	if 'force' in kwargs: del(kwargs['force'])
-	if not force:
-		keyringPass = getKeyringPass()
-		if keyringPass: return keyringPass
 	import xbmcaddon
 	if xbmcaddon.Addon('script.module.password.storage').getSetting('use_remote_control_dialog') == 'true':
 		keyringPass = _getpassRemoteControl(*args,**kwargs)
 	else:
 		keyringPass = _getpass(*args,**kwargs)
-	if not force: saveKeyringPass(keyringPass)
+	return keyringPass
+
+def lazy_getpass(*args,**kwargs):
+	keyringPass = getKeyringPass()
+	if keyringPass: return keyringPass
+	keyringPass = getpass(lazy=True,*args,**kwargs)
+	saveKeyringPass(keyringPass)
 	return keyringPass
 
 def getKeyringPass():

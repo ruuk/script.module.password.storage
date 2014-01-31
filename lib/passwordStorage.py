@@ -50,8 +50,8 @@ def ERROR(msg):
 encrypted = True
 
 def __keyringFallback():
-	import keyringUtils
-	cryptedKeyring = keyringUtils.EnhancedEncryptedKeyring()  # @UndefinedVariable
+	from internal import PythonEncryptedKeyring
+	cryptedKeyring = PythonEncryptedKeyring()  # @UndefinedVariable
 	if cryptedKeyring.viable:
 		keyring.set_keyring(cryptedKeyring)
 	else:
@@ -78,8 +78,8 @@ try:
 	keyring.set_password('PasswordStorage_TEST','TEST','test')
 	if not keyring.get_password('PasswordStorage_TEST','TEST') == 'test': raise Exception()
 	if getKeyringName() == 'file.EncryptedKeyring':
-		import keyringUtils
-		keyring.set_keyring(keyringUtils.EnhancedEncryptedKeyring())
+		from internal import PythonEncryptedKeyring
+		keyring.set_keyring(PythonEncryptedKeyring())
 		
 except:
 	ERROR('Keyring failed test - using fallback keyring')
