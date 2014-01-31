@@ -1,5 +1,4 @@
 import xbmc, xbmcaddon
-
 import platform, re
 
 original_syscmd_uname = platform._syscmd_uname

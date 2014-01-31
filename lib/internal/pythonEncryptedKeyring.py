@@ -12,6 +12,7 @@ try:
 	from lib import getpass  # @UnusedImport
 	from lib.getpass import lazy_getpass
 except:
+	raise
 	#For testing
 	import getpass  #@Reimport
 	lazy_getpass = getpass.getpass
