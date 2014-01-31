@@ -22,11 +22,13 @@ def changePassword():
 		xbmcaddon.Addon('script.module.password.storage').setSetting('keyring_password','')
 		
 		password = kr.change_keyring_password()
-		import binascii
-		xbmcaddon.Addon().setSetting('keyring_password',binascii.hexlify(password))
+		stored = xbmcaddon.Addon().getSetting('keyring_password')
+		if stored:
+			import binascii
+			xbmcaddon.Addon().setSetting('keyring_password',binascii.hexlify(password))
 		xbmcgui.Window(10000).setProperty('KEYRING_password',password)
 	else:
-		xbmcgui.Dialog().ok('Not Required','Keyring does not require','entering a password within XBMC.')
+		xbmcgui.Dialog().ok('Not Required','The current keyring does not require','entering a password within XBMC.')
 	
 def storeKey(store=True):
 	addon = xbmcaddon.Addon()
@@ -56,5 +58,7 @@ if __name__ == '__main__':
 		storeKey()
 	elif sys.argv[-1] == 'clear_key':
 		storeKey(False)
+	elif sys.argv[-1] == 'change_key':
+		changePassword()
 	else:
 		openWindow()
