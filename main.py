@@ -14,7 +14,7 @@ class MainWindow(xbmcgui.WindowXML):
 		if controlID == 200:
 			xbmcaddon.Addon().openSettings()
 
-def askPassword():
+def changePassword():
 	from passwordStorage import keyring# @UnresolvedImport
 	kr = keyring.get_keyring()
 	if hasattr(kr,'change_keyring_password'):
@@ -28,6 +28,16 @@ def askPassword():
 	else:
 		xbmcgui.Dialog().ok('Not Required','Keyring does not require','entering a password within XBMC.')
 	
+def storeKey(store=True):
+	addon = xbmcaddon.Addon()
+	if store:
+		from passwordStorage import keyring# @UnresolvedImport
+		kr = keyring.get_keyring()
+		if hasattr(kr,'change_keyring_password'):
+			addon.setSetting('keyring_password',kr.keyring_key)
+	else:
+		addon.setSetting('keyring_password','')
+		
 def openWindow():
 	import passwordStorage  # @UnresolvedImport
 	text =	'Keyring: [COLOR FF66AAFF]%s[/COLOR][CR][CR]' % passwordStorage.getKeyringName()
@@ -41,7 +51,9 @@ def openWindow():
 	del w
 	
 if __name__ == '__main__':
-	if sys.argv[-1] == 'keyring_password':
-		askPassword()
+	if sys.argv[-1] == 'store_key':
+		storeKey()
+	elif sys.argv[-1] == 'clear_key':
+		storeKey(False)
 	else:
 		openWindow()
