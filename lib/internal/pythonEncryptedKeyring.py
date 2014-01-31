@@ -11,12 +11,10 @@ from keyring.errors import PasswordDeleteError
 try:
 	from lib import getpass  # @UnusedImport
 	from lib.getpass import lazy_getpass
-	print '1'
 except:
 	#For testing
 	import getpass  #@Reimport
 	lazy_getpass = getpass.getpass
-	print '2'
 
 def LOG(msg):
 	print 'script.module.password.storage: ' + msg

@@ -75,12 +75,12 @@ def getKeyringName():
 		return str(kr).strip('<>').split(' ')[0]
 	
 try:
-	keyring.set_password('PasswordStorage_TEST','TEST','test')
-	if not keyring.get_password('PasswordStorage_TEST','TEST') == 'test': raise Exception()
 	if getKeyringName() == 'file.EncryptedKeyring':
 		from internal import PythonEncryptedKeyring
 		keyring.set_keyring(PythonEncryptedKeyring())
-		
+	else:
+		keyring.set_password('PasswordStorage_TEST','TEST','test')
+		if not keyring.get_password('PasswordStorage_TEST','TEST') == 'test': raise Exception()
 except:
 	ERROR('Keyring failed test - using fallback keyring')
 	__keyringFallback()
@@ -120,5 +120,3 @@ ADDON_ID = None
 SERVICE_NAME = None
 
 setAddonID(xbmcaddon.Addon().getAddonInfo('id'))
-
- 
