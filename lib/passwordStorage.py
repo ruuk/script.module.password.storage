@@ -11,6 +11,7 @@ platform._syscmd_uname = new_syscmd_uname
 
 import keyring
 import getpass # @UnusedImport
+from getpass import lazy_getpass  # @UnusedImport
 
 ## keyring escape fix -----------------------------------
 from keyring.util import escape
