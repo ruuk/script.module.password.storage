@@ -148,7 +148,7 @@ class PythonEncryptedKeyring(BaseKeyring):
 	
 	def _write_passwords(self,passwords_dict):
 		with open(self.file_path,'w') as pass_file:
-			json.dump(passwords_dict,pass_file,separators=(',',':'))
+			json.dump(passwords_dict,pass_file,separators=(',',':'),sort_keys=True,indent=4)
 	
 	def encrypt(self, key, password):
 		password = self._encryptDes(key,password)
