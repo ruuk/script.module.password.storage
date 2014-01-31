@@ -66,11 +66,13 @@ def _getpass(prompt='Enter Password:'):
 	return keyringPass
 
 def getpass(*args,**kwargs):
+	print 'NORMAL'
 	import xbmcaddon
 	if xbmcaddon.Addon('script.module.password.storage').getSetting('use_remote_control_dialog') == 'true':
 		keyringPass = _getpassRemoteControl(*args,**kwargs)
 	else:
 		keyringPass = _getpass(*args,**kwargs)
+	print keyringPass
 	return keyringPass
 
 def lazy_getpass(*args,**kwargs):
@@ -84,7 +86,8 @@ def lazy_getpass(*args,**kwargs):
 	return keyringPass
 
 def getKeyringPass():
-	password = xbmcgui.Window(10000).getProperty('KEYRING_password') or xbmc.getInfoLabel('Window(%s).Property(%s)' % (10000,'KEYRING_password')) or ''
+	password = xbmcgui.Window(10000).getProperty('KEYRING_password') or ''
+	#xbmc.getInfoLabel('Window(%s).Property(%s)' % (10000,'KEYRING_password'))
 	
 	if not password:
 		import xbmcaddon
@@ -95,4 +98,4 @@ def getKeyringPass():
 def saveKeyringPass(password):
 	print 'TEST2'
 	xbmcgui.Window(10000).setProperty('KEYRING_password',password)
-	xbmc.executebuiltin('SetProperty(%s,%s,%s)' % ('KEYRING_password',password,10000))
+	#xbmc.executebuiltin('SetProperty(%s,%s,%s)' % ('KEYRING_password',password,10000))
