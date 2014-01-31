@@ -74,6 +74,7 @@ class PythonEncryptedKeyring(BaseKeyring):
 		user.
 		"""
 		self.keyring_key = lazy_getpass('Please enter password for encrypted keyring: ')
+		print "TEST"
 		passwords_dict = self._read_passwords()
 		if not self._check_reference(passwords_dict): raise ValueError("Incorrect Password")
 
