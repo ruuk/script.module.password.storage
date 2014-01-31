@@ -9,7 +9,7 @@ def new_syscmd_uname(option,default=''):
 		return default
 platform._syscmd_uname = new_syscmd_uname
 
-from internal import getpass, lazy_getpass  # @UnusedImport
+from internal import getpass, lazy_getpass, getRememberedKey  # @UnusedImport
 import keyring
 
 
@@ -49,11 +49,17 @@ def ERROR(msg):
 
 encrypted = True
 
+def setPythonEncryptedKeyring():
+	from internal import PythonEncryptedKeyring
+	kr = PythonEncryptedKeyring()
+	key = getRememberedKey()
+	if key: kr.keyring_key = key 
+	keyring.set_keyring(kr)
+		
 def __keyringFallback():
 	from internal import PythonEncryptedKeyring
-	cryptedKeyring = PythonEncryptedKeyring()  # @UndefinedVariable
-	if cryptedKeyring.viable:
-		keyring.set_keyring(cryptedKeyring)
+	if PythonEncryptedKeyring().viable:
+		setPythonEncryptedKeyring()
 	else:
 		keyring.set_keyring(keyring.backends.file.PlaintextKeyring)  # @UndefinedVariable
 		global encrypted
@@ -76,8 +82,7 @@ def getKeyringName():
 	
 try:
 	if getKeyringName() == 'file.EncryptedKeyring':
-		from internal import PythonEncryptedKeyring
-		keyring.set_keyring(PythonEncryptedKeyring())
+		setPythonEncryptedKeyring()
 	else:
 		keyring.set_password('PasswordStorage_TEST','TEST','test')
 		if not keyring.get_password('PasswordStorage_TEST','TEST') == 'test': raise Exception()

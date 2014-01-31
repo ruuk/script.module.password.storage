@@ -80,9 +80,12 @@ def lazy_getpass(*args,**kwargs):
 	saveKeyringPass(keyringPass)
 	return keyringPass
 
-def getKeyringPass():
-	password = xbmcgui.Window(10000).getProperty('KEYRING_password') or ''
+def getRememberedKey():
+	return xbmcgui.Window(10000).getProperty('KEYRING_password') or ''
 	#xbmc.getInfoLabel('Window(%s).Property(%s)' % (10000,'KEYRING_password'))
+	
+def getKeyringPass():
+	password = getRememberedKey()
 	
 	if not password:
 		import xbmcaddon
