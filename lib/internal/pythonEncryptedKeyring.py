@@ -8,13 +8,9 @@ except:
 from keyring.backends.file import BaseKeyring, json
 from keyring.util import properties
 from keyring.errors import PasswordDeleteError
-try:
-	from lib import getpass  # @UnusedImport
-	from lib.getpass import lazy_getpass
-except:
-	#For testing
-	import getpass  #@Reimport
-	lazy_getpass = getpass.getpass
+
+from getpass import getpass, lazy_getpass
+
 
 def LOG(msg):
 	print 'script.module.password.storage: ' + msg
@@ -129,8 +125,8 @@ class PythonEncryptedKeyring(BaseKeyring):
 			
 	def _get_new_password(self):
 		while True:
-			password = getpass.getpass("Please set a password for your new keyring: ")
-			confirm = getpass.getpass('Please confirm the password: ')
+			password = getpass("Please set a password for your new keyring: ")
+			confirm = getpass('Please confirm the password: ')
 			if password != confirm:
 				LOG("Error: Your passwords didn't match\n")
 				continue
