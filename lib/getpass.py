@@ -74,6 +74,7 @@ def getpass(*args,**kwargs):
 	return keyringPass
 
 def lazy_getpass(*args,**kwargs):
+	print 'Blah'
 	keyringPass = getKeyringPass()
 	if keyringPass: return keyringPass
 	keyringPass = getpass(*args,**kwargs)
