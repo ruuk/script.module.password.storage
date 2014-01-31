@@ -89,6 +89,7 @@ class PythonEncryptedKeyring(BaseKeyring):
 		passwords_dict['key'] = self.encrypt(self.keyring_key, key)
 		passwords_dict['check'] = self.encrypt(self.keyring_key, self._check)
 		self._write_passwords(passwords_dict)
+		return self.keyring_key
 		
 	def get_password(self, service, username):
 		"""

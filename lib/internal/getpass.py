@@ -74,13 +74,10 @@ def getpass(*args,**kwargs):
 	return keyringPass
 
 def lazy_getpass(*args,**kwargs):
-	print 'Blah'
 	keyringPass = getKeyringPass()
 	if keyringPass: return keyringPass
 	keyringPass = getpass(*args,**kwargs)
 	saveKeyringPass(keyringPass)
-	print 'TEST'
-	print xbmcgui.Window(10000).getProperty('KEYRING_password')
 	return keyringPass
 
 def getKeyringPass():
@@ -94,6 +91,5 @@ def getKeyringPass():
 	return password
 	
 def saveKeyringPass(password):
-	print 'TEST2'
 	xbmcgui.Window(10000).setProperty('KEYRING_password',password)
 	#xbmc.executebuiltin('SetProperty(%s,%s,%s)' % ('KEYRING_password',password,10000))
