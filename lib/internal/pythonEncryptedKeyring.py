@@ -1,6 +1,6 @@
 import aes, pyDes, hashlib, os, binascii
 try:
-	from .. import keyring  # @UnusedImport
+	from lib import keyring  # @UnusedImport
 except:
 	#For testing
 	import keyring  # @UnusedImport @Reimport
@@ -9,8 +9,8 @@ from keyring.backends.file import BaseKeyring, json
 from keyring.util import properties
 from keyring.errors import PasswordDeleteError
 try:
-	from .. import getpass  # @UnusedImport
-	from ..getpass import lazy_getpass
+	from lib import getpass  # @UnusedImport
+	from lib.getpass import lazy_getpass
 except:
 	#For testing
 	import getpass  #@Reimport
