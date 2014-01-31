@@ -34,7 +34,8 @@ def storeKey(store=True):
 		from passwordStorage import keyring# @UnresolvedImport
 		kr = keyring.get_keyring()
 		if hasattr(kr,'change_keyring_password'):
-			addon.setSetting('keyring_password',kr.keyring_key)
+			import binascii
+			addon.setSetting('keyring_password',binascii.hexlify(kr.keyring_key))
 	else:
 		addon.setSetting('keyring_password','')
 		
