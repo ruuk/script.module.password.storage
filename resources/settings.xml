@@ -4,6 +4,6 @@
 		<setting label="Keyring Password" type="action" id="keyring_password" option="hidden" default="" action="RunScript(script.module.password.storage,change_key)"/>
 		<setting label="Store Keyring Password (THIS IS INSECURE)" type="action" default="" option="" action="RunScript(script.module.password.storage,store_key)" visible="eq(-1,)" />
 		<setting label="Clear Keyring Password (MAKE MORE SECURE)" type="action" default="" option="" action="RunScript(script.module.password.storage,clear_key)" visible="!eq(-2,)" />
-		<setting id="use_remote_control_dialog" type="bool" label="Use Remote Control Password Entry" default="false" />
+		<!--  <setting id="use_remote_control_dialog" type="bool" label="Use Remote Control Password Entry" default="false" /> -->
 	</category>
 </settings>

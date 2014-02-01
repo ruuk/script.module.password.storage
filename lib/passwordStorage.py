@@ -66,11 +66,6 @@ def __keyringFallback():
 		LOG('Using un-encrypted keyring')
 		encrypted = False
 		
-# if xbmc.getCondVisibility('System.Platform.Darwin') or xbmc.getCondVisibility('System.Platform.OSX'):
-# 	LOG("OSX or Darwin detected, using fallback keyring")
-# 	__keyringFallback()
-# else:
-
 def getKeyringName():
 	kr = keyring.get_keyring()
 	try:
@@ -79,9 +74,12 @@ def getKeyringName():
 		return mod + '.' + cls
 	except:
 		return str(kr).strip('<>').split(' ')[0]
-	
+
 try:
-	if getKeyringName() == 'file.EncryptedKeyring':
+	if xbmc.getCondVisibility('System.Platform.Darwin') or xbmc.getCondVisibility('System.Platform.OSX'):
+		LOG("OSX or Darwin detected, using fallback keyring")
+		__keyringFallback()
+	elif getKeyringName() == 'file.EncryptedKeyring':
 		setPythonEncryptedKeyring()
 	else:
 		keyring.set_password('PasswordStorage_TEST','TEST','test')
