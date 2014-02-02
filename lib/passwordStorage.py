@@ -10,26 +10,26 @@ def new_syscmd_uname(option,default=''):
 platform._syscmd_uname = new_syscmd_uname
 
 from internal import getpass, lazy_getpass, getRememberedKey  # @UnusedImport
-import keyring
+if xbmc.getCondVisibility('System.Platform.Darwin') or xbmc.getCondVisibility('System.Platform.OSX'):
+	import internal as keyring  # @UnusedImport
+else:
+	import keyring  # @Reimport
+	## keyring escape fix -----------------------------------
+	from keyring.util import escape
+	escape.ESCAPE_FMT = "_%02x"
 
+	def unescape(value):
+		"""
+		Inverse of escape.
+		"""
+		re_esc = re.compile(
+			# the pattern must be bytes to operate on bytes
+			escape.ESCAPE_FMT.replace('%02X', '(?P<code>[0-9a-f]{2})').encode('ascii')
+		)
+		return re_esc.sub(escape._unescape_code, value.encode('ascii')).decode('utf-8')
 
-## keyring escape fix -----------------------------------
-from keyring.util import escape
-
-escape.ESCAPE_FMT = "_%02x"
-
-def unescape(value):
-	"""
-	Inverse of escape.
-	"""
-	re_esc = re.compile(
-		# the pattern must be bytes to operate on bytes
-		escape.ESCAPE_FMT.replace('%02X', '(?P<code>[0-9a-f]{2})').encode('ascii')
-	)
-	return re_esc.sub(escape._unescape_code, value.encode('ascii')).decode('utf-8')
-
-escape.unescape = unescape
-## End keyring escape fix -----------------------------------
+	escape.unescape = unescape
+	## End keyring escape fix -----------------------------------
 
 
 DEBUG = True
@@ -57,14 +57,15 @@ def setPythonEncryptedKeyring():
 	keyring.set_keyring(kr)
 		
 def __keyringFallback():
-	from internal import PythonEncryptedKeyring
-	if PythonEncryptedKeyring().viable:
-		setPythonEncryptedKeyring()
-	else:
-		keyring.set_keyring(keyring.backends.file.PlaintextKeyring)  # @UndefinedVariable
-		global encrypted
-		LOG('Using un-encrypted keyring')
-		encrypted = False
+	import internal as keyring  # @Reimport @UnusedImport
+# 	from internal import PythonEncryptedKeyring
+# 	if PythonEncryptedKeyring().viable:
+# 		setPythonEncryptedKeyring()
+# 	else:
+# 		keyring.set_keyring(keyring.backends.file.PlaintextKeyring)  # @UndefinedVariable
+# 		global encrypted
+# 		LOG('Using un-encrypted keyring')
+# 		encrypted = False
 		
 def getKeyringName():
 	kr = keyring.get_keyring()
@@ -76,11 +77,9 @@ def getKeyringName():
 		return str(kr).strip('<>').split(' ')[0]
 
 try:
-	if xbmc.getCondVisibility('System.Platform.Darwin') or xbmc.getCondVisibility('System.Platform.OSX'):
-		LOG("OSX or Darwin detected, using fallback keyring")
+	if getKeyringName() == 'file.EncryptedKeyring':
+		#setPythonEncryptedKeyring()
 		__keyringFallback()
-	elif getKeyringName() == 'file.EncryptedKeyring':
-		setPythonEncryptedKeyring()
 	else:
 		keyring.set_password('PasswordStorage_TEST','TEST','test')
 		if not keyring.get_password('PasswordStorage_TEST','TEST') == 'test': raise Exception()
