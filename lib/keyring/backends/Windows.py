@@ -1,6 +1,5 @@
 import sys
 import base64
-import platform
 
 import keyring.util.escape
 from keyring.py27compat import unicode_str
@@ -61,7 +60,7 @@ class EncryptedKeyring(file.BaseKeyring):
         Preferred over file.EncryptedKeyring but not other, more sophisticated
         Windows backends.
         """
-        if not platform.system() == 'Windows':
+        if not sys.platform.startswith("win"):
             raise RuntimeError("Requires Windows")
         return .8
 
@@ -183,7 +182,7 @@ class RegistryKeyring(KeyringBackend):
         """
         Preferred on Windows when pywin32 isn't installed
         """
-        if platform.system() != 'Windows':
+        if not sys.platform.startswith("win"):
             raise RuntimeError("Requires Windows")
         if not has_wincrypto():
             raise RuntimeError("Requires ctypes")
