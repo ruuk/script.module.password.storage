@@ -10,26 +10,26 @@ def new_syscmd_uname(option,default=''):
 platform._syscmd_uname = new_syscmd_uname
 
 from internal import getpass, lazy_getpass, getRememberedKey  # @UnusedImport
-if xbmc.getCondVisibility('System.Platform.Darwin') or xbmc.getCondVisibility('System.Platform.OSX'):
-	import internal as keyring  # @UnusedImport
-else:
-	import keyring  # @Reimport
-	## keyring escape fix -----------------------------------
-	from keyring.util import escape
-	escape.ESCAPE_FMT = "_%02x"
+# if xbmc.getCondVisibility('System.Platform.Darwin') or xbmc.getCondVisibility('System.Platform.OSX'):
+# 	import internal as keyring  # @UnusedImport
+# else:
+import keyring  # @Reimport
+## keyring escape fix -----------------------------------
+from keyring.util import escape
+escape.ESCAPE_FMT = "_%02x"
 
-	def unescape(value):
-		"""
-		Inverse of escape.
-		"""
-		re_esc = re.compile(
-			# the pattern must be bytes to operate on bytes
-			escape.ESCAPE_FMT.replace('%02X', '(?P<code>[0-9a-f]{2})').encode('ascii')
-		)
-		return re_esc.sub(escape._unescape_code, value.encode('ascii')).decode('utf-8')
+def unescape(value):
+	"""
+	Inverse of escape.
+	"""
+	re_esc = re.compile(
+		# the pattern must be bytes to operate on bytes
+		escape.ESCAPE_FMT.replace('%02X', '(?P<code>[0-9a-f]{2})').encode('ascii')
+	)
+	return re_esc.sub(escape._unescape_code, value.encode('ascii')).decode('utf-8')
 
-	escape.unescape = unescape
-	## End keyring escape fix -----------------------------------
+escape.unescape = unescape
+## End keyring escape fix -----------------------------------
 
 
 DEBUG = True
