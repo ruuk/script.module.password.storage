@@ -57,6 +57,7 @@ def setPythonEncryptedKeyring():
 	keyring.set_keyring(kr)
 		
 def __keyringFallback():
+	global keyring
 	import internal as keyring  # @Reimport @UnusedImport
 # 	from internal import PythonEncryptedKeyring
 # 	if PythonEncryptedKeyring().viable:
