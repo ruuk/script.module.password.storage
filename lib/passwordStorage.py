@@ -34,7 +34,7 @@ def retrieve(username,ask_on_fail=True,ask_msg=None):
 	except:
 		ERROR('Failed to get password from keyring')
 	if ask_on_fail:
-		msg = ask_msg or 'Please enter your password for this %s:' % xbmcaddon.Addon(ADDON_ID).getAddonInfo('name')
+		msg = ask_msg or 'Please enter your password for %s:' % xbmcaddon.Addon(ADDON_ID).getAddonInfo('name')
 		password = xbmcutil.passwordPrompt(msg)
 		if password: return password
 	return None
