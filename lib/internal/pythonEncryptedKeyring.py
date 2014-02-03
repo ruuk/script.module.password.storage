@@ -22,7 +22,7 @@ def add_metaclass(metaclass):
 
 def getRandomKey():
 	import random
-	hashlib.md5(str(random.randint(0,9999999999999999))).hexdigest()
+	return hashlib.md5(str(random.randint(0,9999999999999999))).hexdigest()
 	
 class KeyringBackendMeta(abc.ABCMeta):
 	"""
