@@ -36,9 +36,12 @@ def storeKey(store=True):
 		from passwordStorage import keyring# @UnresolvedImport
 		kr = keyring.get_keyring()
 		if hasattr(kr,'change_keyring_password'):
-			import binascii
-			addon.setSetting('keyring_password',binascii.hexlify(kr.keyring_key))
+			from lib.internal import getRandomKey
+			keyring_key = getRandomKey()
+			kr.change_keyring_password(keyring_key)
+			addon.setSetting('keyring_password',keyring_key)
 	else:
+		kr.change_keyring_password()
 		addon.setSetting('keyring_password','')
 		
 def openWindow():

@@ -20,6 +20,10 @@ def add_metaclass(metaclass):
 		return metaclass(cls.__name__, cls.__bases__, orig_vars)
 	return wrapper
 
+def getRandomKey():
+	import random
+	hashlib.md5(str(random.randint(0,9999999999999999))).hexdigest()
+	
 class KeyringBackendMeta(abc.ABCMeta):
 	"""
 	A metaclass that's both an ABCMeta and a type that keeps a registry of
@@ -171,10 +175,9 @@ class PythonEncryptedKeyring(BaseKeyring):
 		"""
 		Initialize a new password file and set the reference password.
 		"""
-		import random
 		self.keyring_key = self._get_new_password()
 		#We create and encrypt and store a secondary key, so the primary key can be changed and all we need to do is decrypt and restore the secondary
-		secondary_key = hashlib.md5(str(random.randint(0,9999999999999999))).hexdigest()
+		secondary_key = getRandomKey()
 		passwords_dict = {	'key':self.encrypt(self.keyring_key, secondary_key),
 							'check':self.encrypt(self.keyring_key, self._check)
 		}
@@ -215,10 +218,13 @@ class PythonEncryptedKeyring(BaseKeyring):
 	def _get_secondary_key(self,passwords_dict):
 		return self.decrypt(self.keyring_key, passwords_dict['key'])
 		
-	def change_keyring_password(self):
+	def change_keyring_password(self,keyring_key=None):
 		passwords_dict = self._read_passwords()
 		key = self._get_secondary_key(passwords_dict)
-		self.keyring_key = self._get_new_password()
+		if keyring_key:
+			self.keyring_key = keyring_key
+		else:
+			self.keyring_key = self._get_new_password()
 		passwords_dict['key'] = self.encrypt(self.keyring_key, key)
 		passwords_dict['check'] = self.encrypt(self.keyring_key, self._check)
 		self._write_passwords(passwords_dict)

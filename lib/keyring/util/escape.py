@@ -28,7 +28,7 @@ LEGAL_CHARS = (
     or getattr(string, 'ascii_letters')  # Python 3
 ) + string.digits
 
-ESCAPE_FMT = "_%02X"
+ESCAPE_FMT = "_%02x"
 
 def _escape_char(c):
     "Single char escape. Return the char, escaped if not already legal"
@@ -55,6 +55,6 @@ def unescape(value):
     """
     re_esc = re.compile(
         # the pattern must be bytes to operate on bytes
-        ESCAPE_FMT.replace('%02X', '(?P<code>[0-9A-F]{2})').encode('ascii')
+        ESCAPE_FMT.replace('%02x', '(?P<code>[0-9a-f]{2})').encode('ascii')
     )
     return re_esc.sub(_unescape_code, value.encode('ascii')).decode('utf-8')

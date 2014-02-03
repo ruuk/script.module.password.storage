@@ -143,6 +143,8 @@ def _load_keyring_path(config):
         pass
 
 def _load_library_extensions():
+    #added by ruuk: We don't need this and it causes an error because we are importing from this version rather than the system version
+    return
     """
     Locate all setuptools entry points by the name 'keyring backends'
     and initialize them.
