@@ -4,7 +4,8 @@ import json, abc
 import platform_, errors
 try:
 	from getpass import getpass, lazy_getpass
-except:
+except ImportError:
+	#For testing
 	from getpass import getpass
 	lazy_getpass = getpass
 

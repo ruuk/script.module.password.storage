@@ -38,6 +38,7 @@ def storeKey(store=True):
 		if hasattr(kr,'change_keyring_password'):
 			from lib.internal import getRandomKey
 			keyring_key = getRandomKey()
+			xbmcgui.Window(10000).setProperty('KEYRING_password','')
 			kr.change_keyring_password(keyring_key)
 			addon.setSetting('keyring_password',keyring_key)
 	else:
