@@ -2,9 +2,11 @@ import aes, pyDes, hashlib, os, binascii
 import properties
 import json, abc
 import platform_, errors
-
-from getpass import getpass, lazy_getpass
-
+try:
+	from getpass import getpass, lazy_getpass
+except:
+	from getpass import getpass
+	lazy_getpass = getpass
 
 def LOG(msg):
 	print 'script.module.password.storage: ' + msg
