@@ -32,18 +32,22 @@ def changePassword():
 	
 def storeKey(store=True):
 	addon = xbmcaddon.Addon()
+	from passwordStorage import keyring, clearKeyMemory# @UnresolvedImport
+	kr = keyring.get_keyring()
 	if store:
-		from passwordStorage import keyring# @UnresolvedImport
-		kr = keyring.get_keyring()
 		if hasattr(kr,'change_keyring_password'):
 			from lib.internal import getRandomKey
 			keyring_key = getRandomKey()
-			xbmcgui.Window(10000).setProperty('KEYRING_password','')
-			kr.change_keyring_password(keyring_key)
+			keyring_key = kr.change_keyring_password(keyring_key)
+			xbmcgui.Window(10000).setProperty('KEYRING_password',keyring_key)
 			addon.setSetting('keyring_password',keyring_key)
+			xbmcgui.Dialog().ok('Stored','Keyring password is now stored on disk.')
 	else:
-		kr.change_keyring_password()
+		clearKeyMemory()
+		keyring_key = kr.change_keyring_password()
 		addon.setSetting('keyring_password','')
+		xbmcgui.Window(10000).setProperty('KEYRING_password',keyring_key)
+		xbmcgui.Dialog().ok('Removed','Keyring password is no longer stored on disk.')
 		
 def openWindow():
 	import passwordStorage  # @UnresolvedImport

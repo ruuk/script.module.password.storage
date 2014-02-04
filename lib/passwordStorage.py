@@ -28,16 +28,17 @@ def retrieve(username,ask_on_fail=True,ask_msg=None):
 	If no password is stored or the is an error and ask_on_fail is true (default) then shows a dialog asking for the password
 	If now password is obtained, returns None
 	"""
+	password = None
 	try:
 		password = keyring.get_password(SERVICE_NAME,username)
-		return password or ''
-# 	except ValueError:
-# 		clearKeyMemory()
-# 		password = keyring.get_password(SERVICE_NAME,username)
-# 		return password or ''
+	except ValueError:
+		clearKeyMemory()
+		password = keyring.get_password(SERVICE_NAME,username)
 	except:
 		ERROR('Failed to get password from keyring')
-	if ask_on_fail:
+	if password:
+		return password
+	elif ask_on_fail:
 		msg = ask_msg or 'Please enter your password for %s:' % xbmcaddon.Addon(ADDON_ID).getAddonInfo('name')
 		password = xbmcutil.passwordPrompt(msg)
 		if password: return password

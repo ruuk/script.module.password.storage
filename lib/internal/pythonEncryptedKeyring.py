@@ -3,11 +3,12 @@ import properties
 import json, abc
 import platform_, errors
 try:
-	from getpass import getpass, lazy_getpass
+	from getpass import getpass, lazy_getpass, saveKeyringPass
 except ImportError:
 	#For testing
 	from getpass import getpass
 	lazy_getpass = getpass
+	saveKeyringPass = lambda x: len(x)
 
 def LOG(msg):
 	print 'script.module.password.storage: ' + msg
@@ -157,7 +158,7 @@ class BaseKeyring(KeyringBackend):
 
 class PythonEncryptedKeyring(BaseKeyring):
 	_check = 'password reference value'
-	
+	_encryption_version = 0
 	filename = 'python_crypted_pass.json'
 	
 	@properties.ClassProperty
@@ -179,10 +180,13 @@ class PythonEncryptedKeyring(BaseKeyring):
 		Initialize a new password file and set the reference password.
 		"""
 		self.keyring_key = self._get_new_password()
+		saveKeyringPass(self.keyring_key)
 		#We create and encrypt and store a secondary key, so the primary key can be changed and all we need to do is decrypt and restore the secondary
 		secondary_key = getRandomKey()
 		passwords_dict = {	'key':self.encrypt(self.keyring_key, secondary_key),
-							'check':self.encrypt(self.keyring_key, self._check)
+							'check':self.encrypt(self.keyring_key, self._check),
+							'version':self._encryption_version,
+							'storage':{}
 		}
 		self._write_passwords(passwords_dict)
 	
@@ -240,7 +244,7 @@ class PythonEncryptedKeyring(BaseKeyring):
 		passwords_dict = self._read_passwords()
 		key = self._get_secondary_key(passwords_dict)
 		try:
-			return self.decrypt(key, passwords_dict[service][username])
+			return self.decrypt(key, passwords_dict['storage'][service][username])
 		except KeyError:
 			return None
 		
@@ -250,9 +254,9 @@ class PythonEncryptedKeyring(BaseKeyring):
 		"""
 		passwords_dict = self._read_passwords()
 		key = self._get_secondary_key(passwords_dict)
-		if not service in passwords_dict: passwords_dict[service] = {}
+		if not service in passwords_dict['storage']: passwords_dict['storage'][service] = {}
 		encrypted_password = self.encrypt(key, password)
-		passwords_dict[service][username] = encrypted_password
+		passwords_dict['storage'][service][username] = encrypted_password
 		self._write_passwords(passwords_dict)
 		
 
@@ -261,7 +265,7 @@ class PythonEncryptedKeyring(BaseKeyring):
 		"""
 		passwords_dict = self._read_passwords()
 		try:
-			del passwords_dict[service][username]
+			del passwords_dict['storage'][service][username]
 		except KeyError:
 			raise errors.PasswordDeleteError("Password not found")
 		self._write_passwords(passwords_dict)
@@ -299,9 +303,11 @@ class PythonEncryptedKeyring(BaseKeyring):
 		return self._decryptDes(key,password)
 
 	def _encryptDes(self,key,password):
-		des = pyDes.triple_des(hashlib.md5(key).digest())
+		key = hashlib.sha224(key).digest()[:24]
+		des = pyDes.triple_des(key)
 		return des.encrypt(password,padmode=pyDes.PAD_PKCS5)
 		
 	def _decryptDes(self,key,password):
-		des = pyDes.triple_des(hashlib.md5(key).digest())
+		key = hashlib.sha224(key).digest()[:24]
+		des = pyDes.triple_des(key)
 		return des.decrypt(password,padmode=pyDes.PAD_PKCS5)
