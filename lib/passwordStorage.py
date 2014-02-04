@@ -31,10 +31,10 @@ def retrieve(username,ask_on_fail=True,ask_msg=None):
 	try:
 		password = keyring.get_password(SERVICE_NAME,username)
 		return password or ''
-	except ValueError:
-		clearKeyMemory()
-		password = keyring.get_password(SERVICE_NAME,username)
-		return password or ''
+# 	except ValueError:
+# 		clearKeyMemory()
+# 		password = keyring.get_password(SERVICE_NAME,username)
+# 		return password or ''
 	except:
 		ERROR('Failed to get password from keyring')
 	if ask_on_fail:

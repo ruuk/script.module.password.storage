@@ -22,8 +22,7 @@ def getRememberedKey():
 	#xbmc.getInfoLabel('Window(%s).Property(%s)' % (10000,'KEYRING_password'))
 	if not key:
 		import xbmcaddon
-		import binascii
-		key = binascii.unhexlify(xbmcaddon.Addon('script.module.password.storage').getSetting('keyring_password') or '')
+		key = xbmcaddon.Addon('script.module.password.storage').getSetting('keyring_password') or ''
 	return key
 	
 def saveKeyringPass(password):
