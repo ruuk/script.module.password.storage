@@ -29,3 +29,6 @@ def getRememberedKey():
 def saveKeyringPass(password):
 	xbmcgui.Window(10000).setProperty('KEYRING_password',password)
 	#xbmc.executebuiltin('SetProperty(%s,%s,%s)' % ('KEYRING_password',password,10000))
+
+def clearKeyMemory():
+	xbmcgui.Window(10000).setProperty('KEYRING_password','')

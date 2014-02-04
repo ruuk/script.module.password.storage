@@ -1,5 +1,5 @@
 import xbmc, xbmcaddon
-from internal import getpass, lazy_getpass, getRememberedKey, xbmcutil  # @UnusedImport
+from internal import getpass, lazy_getpass, getRememberedKey, xbmcutil, clearKeyMemory  # @UnusedImport
 
 import keyring
 
@@ -29,6 +29,10 @@ def retrieve(username,ask_on_fail=True,ask_msg=None):
 	If now password is obtained, returns None
 	"""
 	try:
+		password = keyring.get_password(SERVICE_NAME,username)
+		return password or ''
+	except ValueError:
+		clearKeyMemory()
 		password = keyring.get_password(SERVICE_NAME,username)
 		return password or ''
 	except:
