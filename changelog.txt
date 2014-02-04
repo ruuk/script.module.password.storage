@@ -1,7 +1,15 @@
 Password Storage Module Changelog 
 
-Current Version : 0.0.1
+Current Version : 0.0.47
 
-*** 0.1.0 ***
+0.0.47
 
-Initial public release
+First private repo release for other device testing
+
+0.0.2 - 0.0.46
+
+Initial coding and testing
+
+0.0.1
+
+Project start
