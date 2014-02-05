@@ -103,7 +103,7 @@ except:
 	__keyringFallback()
 
 LOG('Backend: %s' % getKeyringName())
-LOG('Platform: %s' % sys.platform)
+LOG('Platform: %s' % (xbmc.getCondVisibility('System.Platform.Android') and 'android' or sys.platform))
 ADDON_ID = None
 SERVICE_NAME = None
 
