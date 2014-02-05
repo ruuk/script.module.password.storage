@@ -1,6 +1,10 @@
 Password Storage Module Changelog 
 
-Current Version : 0.0.53
+Current Version : 0.0.54
+
+0.0.54
+
+Test logging
 
 0.0.53
 
