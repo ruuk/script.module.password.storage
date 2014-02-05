@@ -1,4 +1,4 @@
-import xbmc, xbmcaddon
+import xbmc, xbmcaddon, sys
 from internal import getpass, lazy_getpass, getRememberedKey, xbmcutil, clearKeyMemory  # @UnusedImport
 
 import keyring
@@ -103,7 +103,7 @@ except:
 	__keyringFallback()
 
 LOG('Backend: %s' % getKeyringName())
-
+LOG('Platform: %s' % sys.platform)
 ADDON_ID = None
 SERVICE_NAME = None
 
