@@ -1,6 +1,10 @@
 Password Storage Module Changelog 
 
-Current Version : 0.0.47
+Current Version : 0.0.48
+
+0.0.48
+
+Fix to prevent use of file.PlaintextKeyring
 
 0.0.47
 

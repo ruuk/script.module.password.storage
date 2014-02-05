@@ -93,7 +93,7 @@ def __keyringFallback():
 encrypted = True
 	
 try:
-	if getKeyringName() == 'file.EncryptedKeyring':
+	if getKeyringName().startswith('file.'):
 		__keyringFallback()
 	else:
 		keyring.set_password('PasswordStorage_TEST','TEST','test')
