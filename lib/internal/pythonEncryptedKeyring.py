@@ -150,7 +150,10 @@ class BaseKeyring(KeyringBackend):
 			with open(self.file_path, 'w'):
 				pass
 			user_read_write = 0o600
-			os.chmod(self.file_path, user_read_write)
+			try:
+				os.chmod(self.file_path, user_read_write)
+			except OSError:
+				LOG('Could not chmod storage file')
 
 	def delete_password(self, service, username):
 		"""Delete the password for the username of the service.

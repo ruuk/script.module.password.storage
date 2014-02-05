@@ -1,6 +1,10 @@
 Password Storage Module Changelog 
 
-Current Version : 0.0.54
+Current Version : 0.0.55
+
+0.0.55
+
+Fix for writing storage on android devices
 
 0.0.54
 
