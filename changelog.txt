@@ -1,7 +1,19 @@
-Password Storage Module Changelog 
+Password Storage Module Changelog
 
-Current Version : 0.0.55
+Current Version : 0.0.56
 
+Tested Platforms:
+
+	Windows XP SP3: Windows.RegistryKeyring
+	ATV2: Internal.PythonEncryptedKeyring
+	Ouya: Internal.PythonEncryptedKeyring
+	OSX: OS_X.Keyring
+	Ubuntu 13.10/XFCE: SecretService.Keyring
+
+0.0.56
+
+Some internal naming changes
+	
 0.0.55
 
 Fix for writing storage on android devices

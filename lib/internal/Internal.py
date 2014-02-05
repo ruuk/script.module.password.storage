@@ -298,7 +298,6 @@ class PythonEncryptedKeyring(BaseKeyring):
 	
 	def _write_passwords(self,passwords_dict):
 		self._ensure_file_path()
-		LOG(self.file_path)
 		with open(self.file_path,'w') as pass_file:
 			json.dump(passwords_dict,pass_file,separators=(',',':'),sort_keys=True,indent=4)
 	

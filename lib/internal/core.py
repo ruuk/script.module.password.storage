@@ -40,7 +40,7 @@ def init_backend():
     """
     Load a keyring specified in the config file or infer the best available.
     """
-    from pythonEncryptedKeyring import PythonEncryptedKeyring
+    from Internal import PythonEncryptedKeyring
     set_keyring(PythonEncryptedKeyring())
 
 
