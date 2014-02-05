@@ -1,6 +1,10 @@
 Password Storage Module Changelog 
 
-Current Version : 0.0.52
+Current Version : 0.0.53
+
+0.0.53
+
+Another fix for storage location on android devices
 
 0.0.52
 
