@@ -245,7 +245,7 @@ class PythonEncryptedKeyring(BaseKeyring):
 		key = self._get_secondary_key(passwords_dict)
 		try:
 			return self.decrypt(key, passwords_dict['storage'][service][username])
-		except KeyError:
+		except (KeyError, ValueError): #KeyError if password not set, ValueError if empty json
 			return None
 		
 
