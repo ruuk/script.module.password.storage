@@ -241,11 +241,15 @@ class PythonEncryptedKeyring(BaseKeyring):
 		"""
 		Read the password from the file.
 		"""
-		passwords_dict = self._read_passwords()
+		try:
+			passwords_dict = self._read_passwords()
+		except ValueError: #ValueError if empty json
+			return None
+			
 		key = self._get_secondary_key(passwords_dict)
 		try:
 			return self.decrypt(key, passwords_dict['storage'][service][username])
-		except (KeyError, ValueError): #KeyError if password not set, ValueError if empty json
+		except KeyError: #KeyError if password not set
 			return None
 		
 

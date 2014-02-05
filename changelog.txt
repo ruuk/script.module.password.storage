@@ -1,6 +1,11 @@
 Password Storage Module Changelog 
 
-Current Version : 0.0.49
+Current Version : 0.0.50
+
+0.0.49
+
+ACTUAL fix for empty json causing error
+
 
 0.0.49
 

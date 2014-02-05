@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.module.password.storage" name="Password Storage" version="0.0.49" provider-name="Rick Phillips (ruuk)">
+<addon id="script.module.password.storage" name="Password Storage" version="0.0.50" provider-name="Rick Phillips (ruuk)">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0" />
 	</requires>
@@ -10,7 +10,7 @@
 	<extension point="xbmc.addon.metadata">
 		<platform>all</platform>
 		<summary lang="en">Module providing encrypted password storage</summary>
-		<description lang="en">Module providing encrypted password storage via keyrings. Will attempt to use the system keyring if available, or fallback to an internal file based keyring.</description>
+		<description lang="en">Module providing encrypted password storage via keyrings. Will attempt to use the system keyring if available, or fallback to an internal file based encrypted keyring.</description>
 		<license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
 		<forum></forum>
 		<source>http://github.com/ruuk/script.module.password.storage</source>
