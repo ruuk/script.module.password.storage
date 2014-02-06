@@ -8,11 +8,25 @@ class MainWindow(xbmcgui.WindowXML):
 	
 	def onInit(self):
 		self.getControl(100).setText(self.text)
-		self.getControl(101).setText(self.errors)
+		self.getControl(201).setEnabled(bool(self.errors))
 	
 	def onClick(self,controlID):
 		if controlID == 200:
 			xbmcaddon.Addon().openSettings()
+		elif controlID == 201:
+			self.openErrorsWindow()
+			
+	def openErrorsWindow(self):
+		w = ErrorWindow('password-storage-text.xml' , xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('path')), 'Main',errors=self.errors)
+		w.doModal()
+		del w
+			
+class ErrorWindow(xbmcgui.WindowXMLDialog):
+	def __init__(self,*args,**kwargs):
+		self.errors = kwargs.get('errors','')
+	
+	def onInit(self):
+		self.getControl(100).setText(self.errors)
 
 def changePassword():
 	from passwordStorage import keyring# @UnresolvedImport
@@ -49,10 +63,16 @@ def storeKey(store=True):
 		xbmcgui.Window(10000).setProperty('KEYRING_password',keyring_key)
 		xbmcgui.Dialog().ok('Removed','Keyring password is no longer stored on disk.')
 		
+def securityLevel():
+	if xbmcaddon.Addon().getSetting('keyring_password'): return 0
+
 def openWindow():
 	import passwordStorage  # @UnresolvedImport
-	text =	'Keyring: [COLOR FF66AAFF]%s[/COLOR][CR][CR]' % passwordStorage.getKeyringName()
+	text =	'Platform: [COLOR FF66AAFF]%s[/COLOR][CR][CR]' % (xbmc.getCondVisibility('System.Platform.Android') and 'android' or sys.platform)
+	text +=	'Keyring: [COLOR FF66AAFF]%s[/COLOR][CR][CR]' % passwordStorage.getKeyringName()
 	text +=	'Uses Encrypted Storage: %s[CR][CR]' % (passwordStorage.encrypted and '[COLOR FF00FF00]Yes[/COLOR]' or '[COLOR FFFF0000]No[/COLOR]')
+	low = bool(xbmcaddon.Addon().getSetting('keyring_password'))
+	text +=	'Security Level: %s[CR][CR]' % (low and '[COLOR FFFF0000]LOW[/COLOR]' or '[COLOR FF00FF00]HIGH[/COLOR]')
 	errors = ''
 	if passwordStorage.LAST_ERROR:
 		errors = 	'ERRORS:[CR][CR]'

@@ -4,56 +4,60 @@ Current Version : 0.0.56
 
 Tested Platforms:
 
-	Windows XP SP3: Windows.RegistryKeyring
-	ATV2: Internal.PythonEncryptedKeyring
-	Ouya: Internal.PythonEncryptedKeyring
-	OSX: OS_X.Keyring
-	Ubuntu 13.10/XFCE: SecretService.Keyring
+	Windows XP SP3:			Windows.RegistryKeyring
+	ATV2:					Internal.PythonEncryptedKeyring
+	Ouya 1.0.12:			Internal.PythonEncryptedKeyring
+	OSX 10.6.3:				OS_X.Keyring
+	Ubuntu 13.10/XFCE:		SecretService.Keyring
+	OpenELEC 3.0 x86_64:	Internal.PythonEncryptedKeyring
+	Android - SG Note 3:	Internal.PythonEncryptedKeyring
+	Raspberry Pi:			NOT TESTED
+	iOS:					NOT TESTED
 
-0.0.56
+-- 0.0.56 --
 
 Some internal naming changes
 	
-0.0.55
+-- 0.0.55 --
 
 Fix for writing storage on android devices
 
-0.0.54
+-- 0.0.54 --
 
 Test logging
 
-0.0.53
+-- 0.0.53 --
 
 Another fix for storage location on android devices
 
-0.0.52
+-- 0.0.52 --
 
 Fix for storage location on android devices
 
-0.0.51
+-- 0.0.51 --
 
 Added logging of platform
 
-0.0.50
+-- 0.0.50 --
 
 ACTUAL fix for empty json causing error
 
-0.0.49
+-- 0.0.49 --
 
 Fix for empty json causing error
 
-0.0.48
+-- 0.0.48 --
 
 Fix to prevent use of file.PlaintextKeyring
 
-0.0.47
+-- 0.0.47 --
 
 First private repo release for other device testing
 
-0.0.2 - 0.0.46
+-- 0.0.2 - 0.0.46 --
 
 Initial coding and testing
 
-0.0.1
+-- 0.0.1 --
 
 Project start
