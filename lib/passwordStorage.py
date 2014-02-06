@@ -1,5 +1,5 @@
 import xbmc, xbmcaddon, sys
-from internal import getpass, lazy_getpass, getRememberedKey, xbmcutil, clearKeyMemory  # @UnusedImport
+from internal import getpass, lazy_getpass, getRememberedKey, xbmcutil, clearKeyMemory  # analysis:ignore
 
 import keyring
 
@@ -88,7 +88,7 @@ def getKeyringName():
 
 def __keyringFallback():
 	global keyring
-	import internal as keyring  # @Reimport @UnusedImport
+	import internal as keyring # analysis:ignore
 
 encrypted = True
 	

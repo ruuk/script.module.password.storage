@@ -7,8 +7,7 @@ class MainWindow(xbmcgui.WindowXML):
 	
 	def onClick(self,controlID):
 		if controlID == 200:
-			xbmcaddon.Addon().openSettings()
-			self.updateDisplay()
+			self.keyringOptions()
 		elif controlID == 201:
 			self.openErrorsWindow()
 			
@@ -35,7 +34,7 @@ class MainWindow(xbmcgui.WindowXML):
 			elif level == 3:
 				levelText = '[COLOR FF00FF00]HIGH[/COLOR]'
 				
-			text +=	'[CR]Security Level: %s' % levelText
+			text +=	'[CR]Security Strength: %s' % levelText
 			
 		text +=	'[CR][CR]Uses Encrypted Storage: %s[CR][CR]' % (passwordStorage.encrypted and '[COLOR FF00FF00]Yes[/COLOR]' or '[COLOR FFFF0000]No[/COLOR]')
 		
@@ -46,6 +45,22 @@ class MainWindow(xbmcgui.WindowXML):
 		self.errors = errors
 		self.getControl(100).setText(text)
 		self.getControl(201).setEnabled(bool(self.errors))
+	
+	def keyringOptions(self):
+		stored = bool(xbmcaddon.Addon().getSetting('keyring_password'))
+		if stored:
+			store = 'Clear Stored Password'
+		else:
+			store = 'Store Password On Disk'
+		options = ['Change Password',store]
+		idx = xbmcgui.Dialog().select('Options',options)
+		if idx < 0: return
+		if idx == 0:
+			changeKey()
+		elif idx == 1:
+			storeKey(not stored)
+		self.updateDisplay()
+
 			
 class ErrorWindow(xbmcgui.WindowXMLDialog):
 	def __init__(self,*args,**kwargs):
@@ -54,7 +69,7 @@ class ErrorWindow(xbmcgui.WindowXMLDialog):
 	def onInit(self):
 		self.getControl(100).setText(self.errors)
 
-def changePassword():
+def changeKey():
 	from passwordStorage import keyring# @UnresolvedImport
 	kr = keyring.get_keyring()
 	if hasattr(kr,'change_keyring_password'):
@@ -69,8 +84,7 @@ def changePassword():
 				continue
 		stored = xbmcaddon.Addon().getSetting('keyring_password')
 		if stored:
-			import binascii
-			xbmcaddon.Addon().setSetting('keyring_password',binascii.hexlify(password))
+			xbmcaddon.Addon().setSetting('keyring_password',password)
 		xbmcgui.Window(10000).setProperty('KEYRING_password',password)
 	else:
 		xbmcgui.Dialog().ok('Not Required','The current keyring does not require','entering a password within XBMC.')
@@ -109,11 +123,4 @@ def openWindow():
 	del w
 	
 if __name__ == '__main__':
-	if sys.argv[-1] == 'store_key':
-		storeKey()
-	elif sys.argv[-1] == 'clear_key':
-		storeKey(False)
-	elif sys.argv[-1] == 'change_key':
-		changePassword()
-	else:
-		openWindow()
+	openWindow()
