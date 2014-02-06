@@ -1,18 +1,14 @@
-import sys
+import sys, re
 import xbmc, xbmcgui, xbmcaddon
 
 class MainWindow(xbmcgui.WindowXML):
-	def __init__(self,*args,**kwargs):
-		self.text = kwargs.get('text','')
-		self.errors = kwargs.get('errors','')
-	
 	def onInit(self):
-		self.getControl(100).setText(self.text)
-		self.getControl(201).setEnabled(bool(self.errors))
+		self.updateDisplay()
 	
 	def onClick(self,controlID):
 		if controlID == 200:
 			xbmcaddon.Addon().openSettings()
+			self.updateDisplay()
 		elif controlID == 201:
 			self.openErrorsWindow()
 			
@@ -20,6 +16,36 @@ class MainWindow(xbmcgui.WindowXML):
 		w = ErrorWindow('password-storage-text.xml' , xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('path')), 'Main',errors=self.errors)
 		w.doModal()
 		del w
+	
+	def updateDisplay(self):
+		import passwordStorage  # @UnresolvedImport
+		keyringName = passwordStorage.getKeyringName()
+		text =	'Platform: [COLOR FF66AAFF]%s[/COLOR][CR][CR]' % (xbmc.getCondVisibility('System.Platform.Android') and 'android' or sys.platform)
+		text +=	'Keyring: [COLOR FF66AAFF]%s[/COLOR]' % keyringName
+		if keyringName.startswith('Internal.'):
+			level = securityLevel()
+			if level < 0:
+				levelText = '[COLOR FF666666]UNKNOWN[/COLOR]'
+			elif level == 0:
+				levelText = '[COLOR FFFF0000]POOR[/COLOR]'
+			elif level == 1:
+				levelText = '[COLOR FFFFFF00]LOW[/COLOR]'
+			elif level == 2:
+				levelText = '[COLOR FF0088FF]MEDIUM[/COLOR]'
+			elif level == 3:
+				levelText = '[COLOR FF00FF00]HIGH[/COLOR]'
+				
+			text +=	'[CR]Security Level: %s' % levelText
+			
+		text +=	'[CR][CR]Uses Encrypted Storage: %s[CR][CR]' % (passwordStorage.encrypted and '[COLOR FF00FF00]Yes[/COLOR]' or '[COLOR FFFF0000]No[/COLOR]')
+		
+		errors = ''
+		if passwordStorage.LAST_ERROR:
+			errors = 	'ERRORS:[CR][CR]'
+			errors += 	'[COLOR FFFF0000]%s[/COLOR]' % passwordStorage.LAST_ERROR
+		self.errors = errors
+		self.getControl(100).setText(text)
+		self.getControl(201).setEnabled(bool(self.errors))
 			
 class ErrorWindow(xbmcgui.WindowXMLDialog):
 	def __init__(self,*args,**kwargs):
@@ -32,10 +58,15 @@ def changePassword():
 	from passwordStorage import keyring# @UnresolvedImport
 	kr = keyring.get_keyring()
 	if hasattr(kr,'change_keyring_password'):
-		xbmcgui.Window(10000).setProperty('KEYRING_password','')
 		xbmcaddon.Addon('script.module.password.storage').setSetting('keyring_password','')
-		
-		password = kr.change_keyring_password()
+		password = ''
+		while not password:
+			xbmcgui.Window(10000).setProperty('KEYRING_password','')
+			try:
+				password = kr.change_keyring_password()
+			except ValueError:
+				xbmcgui.Dialog().ok('Incorrect Password','Wrong password.')
+				continue
 		stored = xbmcaddon.Addon().getSetting('keyring_password')
 		if stored:
 			import binascii
@@ -65,19 +96,15 @@ def storeKey(store=True):
 		
 def securityLevel():
 	if xbmcaddon.Addon().getSetting('keyring_password'): return 0
+	password = xbmcgui.Window(10000).getProperty('KEYRING_password')
+	if not password: return -1
+	level = 1
+	if (re.search('\d',password) and re.search('[^\d]',password)) or password.lower() != password or re.search('[\W_]',password): level += 1
+	if len(password) > 6: level += 1
+	return level
 
 def openWindow():
-	import passwordStorage  # @UnresolvedImport
-	text =	'Platform: [COLOR FF66AAFF]%s[/COLOR][CR][CR]' % (xbmc.getCondVisibility('System.Platform.Android') and 'android' or sys.platform)
-	text +=	'Keyring: [COLOR FF66AAFF]%s[/COLOR][CR][CR]' % passwordStorage.getKeyringName()
-	text +=	'Uses Encrypted Storage: %s[CR][CR]' % (passwordStorage.encrypted and '[COLOR FF00FF00]Yes[/COLOR]' or '[COLOR FFFF0000]No[/COLOR]')
-	low = bool(xbmcaddon.Addon().getSetting('keyring_password'))
-	text +=	'Security Level: %s[CR][CR]' % (low and '[COLOR FFFF0000]LOW[/COLOR]' or '[COLOR FF00FF00]HIGH[/COLOR]')
-	errors = ''
-	if passwordStorage.LAST_ERROR:
-		errors = 	'ERRORS:[CR][CR]'
-		errors += 	'[COLOR FFFF0000]%s[/COLOR]' % passwordStorage.LAST_ERROR
-	w = MainWindow('password-storage-main.xml' , xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('path')), 'Main',text=text,errors=errors)
+	w = MainWindow('password-storage-main.xml' , xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('path')), 'Main')
 	w.doModal()
 	del w
 	

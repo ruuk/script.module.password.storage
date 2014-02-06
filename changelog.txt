@@ -4,15 +4,15 @@ Current Version : 0.0.56
 
 Tested Platforms:
 
-	Windows XP SP3:			Windows.RegistryKeyring
-	ATV2:					Internal.PythonEncryptedKeyring
-	Ouya 1.0.12:			Internal.PythonEncryptedKeyring
-	OSX 10.6.3:				OS_X.Keyring
-	Ubuntu 13.10/XFCE:		SecretService.Keyring
-	OpenELEC 3.0 x86_64:	Internal.PythonEncryptedKeyring
-	Android - SG Note 3:	Internal.PythonEncryptedKeyring
-	Raspberry Pi:			NOT TESTED
-	iOS:					NOT TESTED
+	Windows XP SP3:      Windows.RegistryKeyring
+	ATV2:                Internal.PythonEncryptedKeyring
+	Ouya 1.0.12:         Internal.PythonEncryptedKeyring
+	OSX 10.6.3:	          OS_X.Keyring
+	Ubuntu 13.10/XFCE:   SecretService.Keyring
+	OpenELEC 3.0 x86_64: Internal.PythonEncryptedKeyring
+	Android - SG Note 3: Internal.PythonEncryptedKeyring
+	Raspberry Pi:        NOT TESTED
+	iOS:                 NOT TESTED
 
 -- 0.0.56 --
 

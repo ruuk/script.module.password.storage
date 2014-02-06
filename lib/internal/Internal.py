@@ -2,16 +2,18 @@ import aes, pyDes, hashlib, os, binascii
 import properties
 import json, abc
 import platform_, errors
+
+def LOG(msg):
+	print 'script.module.password.storage: ' + msg
+	
 try:
-	from getpass import getpass, lazy_getpass, saveKeyringPass
+	from getpass import getpass, lazy_getpass, saveKeyringPass, showMessage
 except ImportError:
 	#For testing
 	from getpass import getpass
 	lazy_getpass = getpass
 	saveKeyringPass = lambda x: len(x)
-
-def LOG(msg):
-	print 'script.module.password.storage: ' + msg
+	showMessage = LOG
 
 def add_metaclass(metaclass):
 	"""Class decorator for creating a class with a metaclass."""
@@ -282,11 +284,11 @@ class PythonEncryptedKeyring(BaseKeyring):
 			password = getpass("Please set a password for your new keyring: ")
 			confirm = getpass('Please confirm the password: ')
 			if password != confirm:
-				LOG("Error: Your passwords didn't match\n")
+				showMessage("Error: Your passwords didn't match\n")
 				continue
 			if '' == password.strip():
 				# forbid the blank password
-				LOG("Error: blank passwords aren't allowed.\n")
+				showMessage("Error: blank passwords aren't allowed.\n")
 				continue
 			return password
 		

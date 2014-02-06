@@ -31,3 +31,6 @@ def saveKeyringPass(password):
 
 def clearKeyMemory():
 	xbmcgui.Window(10000).setProperty('KEYRING_password','')
+	
+def showMessage(msg):
+	xbmcgui.Dialog().ok('Message',msg)
