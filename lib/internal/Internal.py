@@ -15,6 +15,10 @@ except ImportError:
 	saveKeyringPass = lambda x: len(x)
 	showMessage = LOG
 
+import xbmcaddon
+
+T = xbmcaddon.Addon('script.module.password.storage').getLocalizedString
+
 def add_metaclass(metaclass):
 	"""Class decorator for creating a class with a metaclass."""
 	def wrapper(cls):
@@ -217,7 +221,7 @@ class PythonEncryptedKeyring(BaseKeyring):
 		Unlock this keyring by getting the password for the keyring from the
 		user.
 		"""
-		self.keyring_key = lazy_getpass('Please enter password for encrypted keyring: ')
+		self.keyring_key = lazy_getpass(T(32025))
 		passwords_dict = self._read_passwords()
 		if not self._check_reference(passwords_dict): raise ValueError("Incorrect Password")
 
@@ -281,14 +285,14 @@ class PythonEncryptedKeyring(BaseKeyring):
 			
 	def _get_new_password(self):
 		while True:
-			password = getpass("Please set a password for your new keyring: ")
-			confirm = getpass('Please confirm the password: ')
+			password = getpass(T(32026))
+			confirm = getpass(T(32027))
 			if password != confirm:
-				showMessage("Error: Your passwords didn't match\n")
+				showMessage(T(32028))
 				continue
 			if '' == password.strip():
 				# forbid the blank password
-				showMessage("Error: blank passwords aren't allowed.\n")
+				showMessage(T(32029))
 				continue
 			return password
 		

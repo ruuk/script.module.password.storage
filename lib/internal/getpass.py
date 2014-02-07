@@ -33,4 +33,5 @@ def clearKeyMemory():
 	xbmcgui.Window(10000).setProperty('KEYRING_password','')
 	
 def showMessage(msg):
-	xbmcgui.Dialog().ok('Message',msg)
+	import xbmcaddon
+	xbmcgui.Dialog().ok(xbmcaddon.Addon('script.module.password.storage').getLocalizedString(32023),msg)

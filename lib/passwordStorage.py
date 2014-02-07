@@ -18,15 +18,16 @@ def ERROR(msg):
 		return
 	traceback.print_exc()
 
-###########################################################################################################
+###############################################################################
 # Public functions
-###########################################################################################################
+###############################################################################
 
 def retrieve(username,ask_on_fail=True,ask_msg=None):
 	"""
 	Get the password associated with the provided username
-	If no password is stored or the is an error and ask_on_fail is true (default) then shows a dialog asking for the password
-	If now password is obtained, returns None
+	If no password is stored or the is an error and ask_on_fail is
+	true (default) then shows a dialog asking for the password
+	If no password is obtained, returns None
 	"""
 	password = None
 	try:
@@ -39,7 +40,7 @@ def retrieve(username,ask_on_fail=True,ask_msg=None):
 	if password:
 		return password
 	elif ask_on_fail:
-		msg = ask_msg or 'Please enter your password for %s:' % xbmcaddon.Addon(ADDON_ID).getAddonInfo('name')
+		msg = ask_msg or xbmcaddon.Addon('script.module.password.storage').getLocalizedString(32024).format(xbmcaddon.Addon(ADDON_ID).getAddonInfo('name'))
 		password = xbmcutil.passwordPrompt(msg)
 		if password: return password
 	return None
@@ -84,7 +85,7 @@ def getKeyringName():
 	except:
 		return str(kr).strip('<>').split(' ')[0]
 	
-# End Public Functions ####################################################################################
+# End Public Functions ########################################################
 
 def __keyringFallback():
 	global keyring
@@ -97,7 +98,8 @@ try:
 		__keyringFallback()
 	else:
 		keyring.set_password('PasswordStorage_TEST','TEST','test')
-		if not keyring.get_password('PasswordStorage_TEST','TEST') == 'test': raise Exception()
+		if not keyring.get_password('PasswordStorage_TEST','TEST') == 'test':
+			raise Exception()
 except:
 	ERROR('Keyring failed test - using fallback keyring')
 	__keyringFallback()

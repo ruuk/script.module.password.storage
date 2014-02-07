@@ -1,0 +1,151 @@
+# XBMC Media Center language file
+msgid ""
+msgstr ""
+"Project-Id-Version: XBMC-Addons\n"
+"Report-Msgid-Bugs-To: alanwww1@xbmc.org\n"
+"POT-Creation-Date: 2013-12-03 23:39+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: en\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+msgctxt "#32000"
+msgid "Platform"
+msgstr ""
+
+msgctxt "#32001"
+msgid "Keyring"
+msgstr ""
+
+msgctxt "#32002"
+msgid "Security Strength"
+msgstr ""
+
+msgctxt "#32003"
+msgid "Uses Encrypted Storage"
+msgstr ""
+
+msgctxt "#32004"
+msgid "ERRORS"
+msgstr ""
+
+msgctxt "#32005"
+msgid "UNKNOWN"
+msgstr ""
+
+msgctxt "#32006"
+msgid "POOR"
+msgstr ""
+
+msgctxt "#32007"
+msgid "LOW"
+msgstr ""
+
+msgctxt "#32008"
+msgid "MEDIUM"
+msgstr ""
+
+msgctxt "#32009"
+msgid "HIGH"
+msgstr ""
+
+msgctxt "#32010"
+msgid "Yes"
+msgstr ""
+
+msgctxt "#32011"
+msgid "No"
+msgstr ""
+
+msgctxt "#32012"
+msgid "Clear Stored Password"
+msgstr ""
+
+msgctxt "#32013"
+msgid "Store Password On Disk"
+msgstr ""
+
+msgctxt "#32014"
+msgid "Change Password"
+msgstr ""
+
+msgctxt "#32015"
+msgid "Options"
+msgstr ""
+
+msgctxt "#32016"
+msgid "Incorrect Password"
+msgstr ""
+
+msgctxt "#32017"
+msgid "Stored"
+msgstr ""
+
+msgctxt "#32018"
+msgid "Keyring password is now stored on disk."
+msgstr ""
+
+msgctxt "#32019"
+msgid "Removed"
+msgstr ""
+
+msgctxt "#32020"
+msgid "Keyring password is no longer stored on disk."
+msgstr ""
+
+msgctxt "#32021"
+msgid "KEYRING OPTIONS"
+msgstr ""
+
+msgctxt "#32022"
+msgid "Please run the addon to access options"
+msgstr ""
+
+msgctxt "#32023"
+msgid "Message"
+msgstr ""
+
+#{0} must remain in string
+msgctxt "#32024"
+msgid "Please enter your password for {0}:"
+msgstr ""
+
+msgctxt "#32025"
+msgid "Enter password to unlock the encrypted keyring:"
+msgstr ""
+
+msgctxt "#32026"
+msgid "Please set a NEW password for your keyring:"
+msgstr ""
+
+msgctxt "#32027"
+msgid "Please confirm the password:"
+msgstr ""
+
+msgctxt "#32028"
+msgid "Error: Your passwords didn't match!"
+msgstr ""
+
+msgctxt "#32029"
+msgid "Error: Blank passwords are not allowed!"
+msgstr ""
+
+msgctxt "#32030"
+msgid "Success"
+msgstr ""
+
+msgctxt "#32031"
+msgid "Keyring password changed."
+msgstr ""
+
+msgctxt "#32032"
+msgid "NO ERRORS"
+msgstr ""
+
+msgctxt "#32033"
+msgid "NO KEYRING OPTIONS"
+msgstr ""

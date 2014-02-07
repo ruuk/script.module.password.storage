@@ -1,6 +1,6 @@
 Password Storage Module Changelog
 
-Current Version : 0.0.57
+Current Version : 0.0.58
 
 Tested Platforms:
 
@@ -13,6 +13,11 @@ Tested Platforms:
 	Android - SG Note 3: Internal.PythonEncryptedKeyring
 	Raspberry Pi:        NOT TESTED
 	iOS:                 NOT TESTED
+
+-- 0.0.58 --
+
+Localize strings
+Minor tweaks to the interface
 
 -- 0.0.57 --
 

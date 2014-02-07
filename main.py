@@ -1,8 +1,14 @@
 import sys, re
 import xbmc, xbmcgui, xbmcaddon
 
+ADDON = xbmcaddon.Addon()
+T = ADDON.getLocalizedString
+
 class MainWindow(xbmcgui.WindowXML):
 	def onInit(self):
+		self.infoDisplay = self.getControl(100)
+		self.errorsButton = self.getControl(201)
+		self.optionsButton = self.getControl(200)
 		self.updateDisplay()
 	
 	def onClick(self,controlID):
@@ -12,48 +18,54 @@ class MainWindow(xbmcgui.WindowXML):
 			self.openErrorsWindow()
 			
 	def openErrorsWindow(self):
-		w = ErrorWindow('password-storage-text.xml' , xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('path')), 'Main',errors=self.errors)
+		w = ErrorWindow('password-storage-text.xml' , xbmc.translatePath(ADDON.getAddonInfo('path')), 'Main',errors=self.errors)
 		w.doModal()
 		del w
 	
 	def updateDisplay(self):
 		import passwordStorage  # @UnresolvedImport
 		keyringName = passwordStorage.getKeyringName()
-		text =	'Platform: [COLOR FF66AAFF]%s[/COLOR][CR][CR]' % (xbmc.getCondVisibility('System.Platform.Android') and 'android' or sys.platform)
-		text +=	'Keyring: [COLOR FF66AAFF]%s[/COLOR]' % keyringName
+		text =	'{0}: [COLOR FF66AAFF]{1}[/COLOR][CR][CR]'.format(T(32000),xbmc.getCondVisibility('System.Platform.Android') and 'android' or sys.platform)
+		text +=	'{0}: [COLOR FF66AAFF]{1}[/COLOR]'.format(T(32001),keyringName)
 		if keyringName.startswith('Internal.'):
 			level = securityLevel()
 			if level < 0:
-				levelText = '[COLOR FF666666]UNKNOWN[/COLOR]'
+				levelText = '[COLOR FF666666]{0}[/COLOR]'.format(T(32005))
 			elif level == 0:
-				levelText = '[COLOR FFFF0000]POOR[/COLOR]'
+				levelText = '[COLOR FFFF0000]{0}[/COLOR]'.format(T(32006))
 			elif level == 1:
-				levelText = '[COLOR FFFFFF00]LOW[/COLOR]'
+				levelText = '[COLOR FFFFFF00]{0}[/COLOR]'.format(T(32007))
 			elif level == 2:
-				levelText = '[COLOR FF0088FF]MEDIUM[/COLOR]'
+				levelText = '[COLOR FF0088FF]{0}[/COLOR]'.format(T(32008))
 			elif level == 3:
-				levelText = '[COLOR FF00FF00]HIGH[/COLOR]'
+				levelText = '[COLOR FF00FF00]{0}[/COLOR]'.format(T(32009))
 				
-			text +=	'[CR]Security Strength: %s' % levelText
+			text +=	'[CR]{0}: {1}'.format(T(32002),levelText)
 			
-		text +=	'[CR][CR]Uses Encrypted Storage: %s[CR][CR]' % (passwordStorage.encrypted and '[COLOR FF00FF00]Yes[/COLOR]' or '[COLOR FFFF0000]No[/COLOR]')
+		text +=	'[CR][CR]{0}: {1}[CR][CR]'.format(
+			T(32003),passwordStorage.encrypted and '[COLOR FF00FF00]{0}[/COLOR]'.format(T(32010)) or '[COLOR FFFF0000]{0}[/COLOR]'.format(T(32011))
+		)
 		
 		errors = ''
 		if passwordStorage.LAST_ERROR:
-			errors = 	'ERRORS:[CR][CR]'
+			errors = 	'{0}:[CR][CR]'.format(T(32004))
 			errors += 	'[COLOR FFFF0000]%s[/COLOR]' % passwordStorage.LAST_ERROR
 		self.errors = errors
-		self.getControl(100).setText(text)
-		self.getControl(201).setEnabled(bool(self.errors))
+		self.infoDisplay.setText(text)
+		if not bool(self.errors): self.errorsButton.setLabel(T(32032))
+		self.errorsButton.setEnabled(bool(self.errors))
+		if not keyringName.startswith('Internal'): self.optionsButton.setLabel(T(32033))
+		self.optionsButton.setEnabled(keyringName.startswith('Internal'))
 	
 	def keyringOptions(self):
-		stored = bool(xbmcaddon.Addon().getSetting('keyring_password'))
+		print repr(ADDON.getSetting('keyring_password'))
+		stored = bool(ADDON.getSetting('keyring_password'))
 		if stored:
-			store = 'Clear Stored Password'
+			store = T(32012)
 		else:
-			store = 'Store Password On Disk'
-		options = ['Change Password',store]
-		idx = xbmcgui.Dialog().select('Options',options)
+			store = T(32013)
+		options = [T(32014),store]
+		idx = xbmcgui.Dialog().select(T(32015),options)
 		if idx < 0: return
 		if idx == 0:
 			changeKey()
@@ -80,17 +92,15 @@ def changeKey():
 			try:
 				password = kr.change_keyring_password()
 			except ValueError:
-				xbmcgui.Dialog().ok('Incorrect Password','Wrong password.')
+				xbmcgui.Dialog().ok(T(32016),T(32016))
 				continue
-		stored = xbmcaddon.Addon().getSetting('keyring_password')
+		stored = ADDON.getSetting('keyring_password')
 		if stored:
-			xbmcaddon.Addon().setSetting('keyring_password',password)
+			ADDON.setSetting('keyring_password',password)
 		xbmcgui.Window(10000).setProperty('KEYRING_password',password)
-	else:
-		xbmcgui.Dialog().ok('Not Required','The current keyring does not require','entering a password within XBMC.')
-	
+		xbmcgui.Dialog().ok(T(32030),T(32031))
+
 def storeKey(store=True):
-	addon = xbmcaddon.Addon()
 	from passwordStorage import keyring, clearKeyMemory# @UnresolvedImport
 	kr = keyring.get_keyring()
 	if store:
@@ -99,17 +109,17 @@ def storeKey(store=True):
 			keyring_key = getRandomKey()
 			keyring_key = kr.change_keyring_password(keyring_key)
 			xbmcgui.Window(10000).setProperty('KEYRING_password',keyring_key)
-			addon.setSetting('keyring_password',keyring_key)
-			xbmcgui.Dialog().ok('Stored','Keyring password is now stored on disk.')
+			ADDON.setSetting('keyring_password',keyring_key)
+			xbmcgui.Dialog().ok(T(32017),T(32018))
 	else:
 		clearKeyMemory()
 		keyring_key = kr.change_keyring_password()
-		addon.setSetting('keyring_password','')
+		ADDON.setSetting('keyring_password','')
 		xbmcgui.Window(10000).setProperty('KEYRING_password',keyring_key)
-		xbmcgui.Dialog().ok('Removed','Keyring password is no longer stored on disk.')
+		xbmcgui.Dialog().ok(T(32019),T(32020))
 		
 def securityLevel():
-	if xbmcaddon.Addon().getSetting('keyring_password'): return 0
+	if ADDON.getSetting('keyring_password'): return 0
 	password = xbmcgui.Window(10000).getProperty('KEYRING_password')
 	if not password: return -1
 	level = 1
@@ -118,7 +128,7 @@ def securityLevel():
 	return level
 
 def openWindow():
-	w = MainWindow('password-storage-main.xml' , xbmc.translatePath(xbmcaddon.Addon().getAddonInfo('path')), 'Main')
+	w = MainWindow('password-storage-main.xml' , xbmc.translatePath(ADDON.getAddonInfo('path')), 'Main')
 	w.doModal()
 	del w
 	
