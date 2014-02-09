@@ -306,21 +306,27 @@ class PythonEncryptedKeyring(BaseKeyring):
 		self._ensure_file_path()
 		with open(self.file_path,'w') as pass_file:
 			json.dump(passwords_dict,pass_file,separators=(',',':'),sort_keys=True,indent=4)
-	
+			
 	def encrypt(self, key, password):
-		password = self._encryptDes(key,password)
-		return binascii.hexlify(aes.encryptData(hashlib.md5(key).digest(),password))
-
-	def decrypt(self, key, password_encrypted):
-		password = aes.decryptData(hashlib.md5(key).digest(),binascii.unhexlify(password_encrypted))
-		return self._decryptDes(key,password)
-
-	def _encryptDes(self,key,password):
-		key = hashlib.sha224(key).digest()[:24]
-		des = pyDes.triple_des(key)
-		return des.encrypt(password,padmode=pyDes.PAD_PKCS5)
+		return encrypt(key, password)
 		
-	def _decryptDes(self,key,password):
-		key = hashlib.sha224(key).digest()[:24]
-		des = pyDes.triple_des(key)
-		return des.decrypt(password,padmode=pyDes.PAD_PKCS5)
+	def decrypt(self, key, password_encrypted):
+		return decrypt(key, password_encrypted)
+		
+def encrypt(key, password):
+	password = _encryptDes(key,password)
+	return binascii.hexlify(aes.encryptData(hashlib.md5(key).digest(),password))
+
+def decrypt(key, password_encrypted):
+	password = aes.decryptData(hashlib.md5(key).digest(),binascii.unhexlify(password_encrypted))
+	return _decryptDes(key,password)
+
+def _encryptDes(key,password):
+	key = hashlib.sha224(key).digest()[:24]
+	des = pyDes.triple_des(key)
+	return des.encrypt(password,padmode=pyDes.PAD_PKCS5)
+	
+def _decryptDes(key,password):
+	key = hashlib.sha224(key).digest()[:24]
+	des = pyDes.triple_des(key)
+	return des.decrypt(password,padmode=pyDes.PAD_PKCS5)

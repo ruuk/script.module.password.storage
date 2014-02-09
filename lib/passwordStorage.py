@@ -85,6 +85,30 @@ def getKeyringName():
 	except:
 		return str(kr).strip('<>').split(' ')[0]
 	
+def encrypt(identifier,data):
+	"""
+	Encrypt some data. A random key is stored in the keyring for the
+	identifier specified, and then used to encrypt the data.
+	The returned encrypted data is hex encoded.
+	"""
+	identifier += '_DATA_KEY' #To avoid collisions with usernames
+	from internal.Internal import getRandomKey, encrypt
+	key = getRandomKey()
+	store(identifier,key)
+	return encrypt(key,data)
+	
+def decrypt(identifier,encrypted_data):
+	"""
+	Decrypt some previously encrypted data. The key is retrieved from the
+	keyring for the	identifier specified, and then used to decrypt the data.
+	Returns None if no key is found.
+	"""
+	identifier += '_DATA_KEY' #To avoid collisions with usernames
+	from internal.Internal import decrypt
+	key = retrieve(identifier,ask_on_fail=False)
+	if not key: return None
+	return decrypt(key,encrypted_data)
+	
 # End Public Functions ########################################################
 
 def __keyringFallback():
