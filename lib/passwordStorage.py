@@ -64,6 +64,20 @@ def store(username,password):
 		ERROR('Failed to save password to keyring')
 	return False
 
+def delete(username_or_identifier,for_data=False):
+	"""
+	Delete the stored password for the associated username from the keyring.
+	Seting for_data=True will delete the key for the identifier from a
+	previous data encrypt() call.
+	"""
+	if for_data: username_or_identifier += '_DATA_KEY'
+	try:
+		keyring.delete_password(SERVICE_NAME,username_or_identifier)
+		return True
+	except:
+		ERROR('Failed to delete password from keyring')
+	return False
+	
 def setAddonID(ID):
 	"""
 	Set the addon ID for which passwords will be stored
