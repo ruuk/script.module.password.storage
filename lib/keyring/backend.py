@@ -17,7 +17,7 @@ class KeyringBackendMeta(abc.ABCMeta):
     A metaclass that's both an ABCMeta and a type that keeps a registry of
     all (non-abstract) types.
     """
-    def __init__(cls, name, bases, dict):  # @NoSelf
+    def __init__(cls, name, bases, dict):
         super(KeyringBackendMeta, cls).__init__(name, bases, dict)
         if not hasattr(cls, '_classes'):
             cls._classes = set()
@@ -33,7 +33,7 @@ class KeyringBackend(object):
     """
 
     #@abc.abstractproperty
-    def priority(cls):  # @NoSelf
+    def priority(cls):
         """
         Each backend class must supply a priority, a number (float or integer)
         indicating the priority of the backend relative to all other backends.
