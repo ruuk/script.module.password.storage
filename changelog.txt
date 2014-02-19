@@ -1,6 +1,6 @@
 Password Storage Module Changelog
 
-Current Version : 0.1.2
+Current Version : 0.1.3
 
 Tested Platforms:
 
@@ -13,6 +13,10 @@ Tested Platforms:
 	Android - SG Note 3:    Internal.PythonEncryptedKeyring
 	Raspberry Pi (Raspbmc): Internal.PythonEncryptedKeyring
 	iOS:                    NOT TESTED
+
+-- 0.1.3 --
+
+Internal keyring now defaults to storing random keyring key to disk
 
 -- 0.1.2 --
 

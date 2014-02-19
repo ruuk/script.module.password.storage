@@ -1,7 +1,5 @@
 import xbmc, xbmcaddon, sys
-from internal import getpass, lazy_getpass, getRememberedKey, xbmcutil, clearKeyMemory  # analysis:ignore
-
-import keyring
+from internal import getpass, lazy_getpass, getRememberedKey, xbmcutil, clearKeyMemory, getRandomKey  # analysis:ignore
 
 DEBUG = True
 LAST_ERROR = ''
@@ -18,6 +16,27 @@ def ERROR(msg):
 		return
 	traceback.print_exc()
 
+FIRST_RUN = False
+if not xbmcaddon.Addon('script.module.password.storage').getSetting('not_first_run_flag'):
+	xbmcaddon.Addon('script.module.password.storage').setSetting('not_first_run_flag','true')
+	FIRST_RUN = True
+	LOG('FIRST RUN')
+
+def saveKeyToDisk():
+	kr = keyring.get_keyring()
+	if hasattr(kr,'change_keyring_password'):
+		keyring_key = getRandomKey()
+		keyring_key = kr.change_keyring_password(keyring_key)
+		import xbmcgui
+		xbmcgui.Window(10000).setProperty('KEYRING_password',keyring_key)
+		xbmcaddon.Addon('script.module.password.storage').setSetting('keyring_password',keyring_key)
+		
+try:
+	import keyring
+except:
+	import internal as keyring
+	if FIRST_RUN: saveKeyToDisk()
+	
 ###############################################################################
 # Public functions
 ###############################################################################
@@ -128,6 +147,7 @@ def decrypt(identifier,encrypted_data):
 def __keyringFallback():
 	global keyring
 	import internal as keyring # analysis:ignore
+	if FIRST_RUN: saveKeyToDisk()
 
 encrypted = True
 	
