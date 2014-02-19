@@ -184,11 +184,11 @@ class PythonEncryptedKeyring(BaseKeyring):
 			self._init_file()
 		return self.keyring_key
 
-	def _init_file(self):
+	def _init_file(self,keyring_key=None):
 		"""
 		Initialize a new password file and set the reference password.
 		"""
-		self.keyring_key = self._get_new_password()
+		self.keyring_key = keyring_key or self._get_new_password()
 		saveKeyringPass(self.keyring_key)
 		#We create and encrypt and store a secondary key, so the primary key can be changed and all we need to do is decrypt and restore the secondary
 		secondary_key = getRandomKey()
@@ -286,7 +286,7 @@ class PythonEncryptedKeyring(BaseKeyring):
 	def _get_new_password(self):
 		while True:
 			password = getpass(T(32026))
-			confirm = getpass(T(32027))
+			confirm = getpass(T(32027),confirm=True)
 			if password != confirm:
 				showMessage(T(32028))
 				continue

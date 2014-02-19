@@ -4,6 +4,11 @@ import xbmcutil
 
 def getpass(*args,**kwargs):
 	import xbmcaddon
+	
+	if not kwargs.get('confirm'):
+		keyringPass = getRememberedKey()
+		if keyringPass: return keyringPass
+		
 	if xbmcaddon.Addon('script.module.password.storage').getSetting('use_remote_control_dialog') == 'true':
 		keyringPass = xbmcutil.remoteControlPasswordPrompt(*args,**kwargs)
 	else:

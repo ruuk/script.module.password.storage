@@ -26,6 +26,7 @@ def saveKeyToDisk():
 	kr = keyring.get_keyring()
 	if hasattr(kr,'change_keyring_password'):
 		keyring_key = getRandomKey()
+		kr._init_file(keyring_key)
 		keyring_key = kr.change_keyring_password(keyring_key)
 		import xbmcgui
 		xbmcgui.Window(10000).setProperty('KEYRING_password',keyring_key)
