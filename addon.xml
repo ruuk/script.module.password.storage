@@ -12,7 +12,7 @@
 		<summary lang="en">Module providing encrypted password storage</summary>
 		<description lang="en">Module providing encrypted password storage via keyrings. Will attempt to use the system keyring if available, or fallback to an internal file based encrypted keyring.</description>
 		<license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
-		<forum></forum>
+		<forum>http://forum.xbmc.org/showthread.php?tid=185631</forum>
 		<source>http://github.com/ruuk/script.module.password.storage</source>
 	</extension>
 </addon>

@@ -1,6 +1,6 @@
 Password Storage Module Changelog
 
-Current Version : 0.1.4
+Current Version : 0.1.5
 
 Tested Platforms:
 
@@ -13,6 +13,10 @@ Tested Platforms:
 	Android - SG Note 3:    Internal.PythonEncryptedKeyring
 	Raspberry Pi (Raspbmc): Internal.PythonEncryptedKeyring
 	iOS:                    NOT TESTED
+
+-- 0.1.5 --
+
+Fix for SecretService keyring errors causing fallback to Internal keyring
 
 -- 0.1.4 --
 

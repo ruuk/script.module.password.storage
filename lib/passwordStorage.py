@@ -35,6 +35,7 @@ def saveKeyToDisk():
 try:
 	import keyring
 except:
+	ERROR('TEST')
 	import internal as keyring
 	if FIRST_RUN: saveKeyToDisk()
 	
