@@ -28,7 +28,7 @@ class Keyring(KeyringBackend):
         if not hasattr(secretstorage, 'get_default_collection'):
             raise RuntimeError("SecretStorage 1.0 or newer required")
         try:
-            bus = secretstorage.dbus_init(main_loop=False)
+            bus = secretstorage.dbus_init()
             list(secretstorage.get_all_collections(bus))
         except exceptions.SecretServiceNotAvailableException as e:
             raise RuntimeError(
@@ -36,7 +36,7 @@ class Keyring(KeyringBackend):
         return 5
 
     def get_default_collection(self):
-        bus = secretstorage.dbus_init(main_loop=False)
+        bus = secretstorage.dbus_init()
         try:
             collection = secretstorage.get_default_collection(bus)
         except exceptions.SecretStorageException as e:
