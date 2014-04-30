@@ -7,11 +7,11 @@ try:
 except ImportError:
     pass
 
-from keyring.backend import KeyringBackend
-from keyring.errors import PasswordSetError, PasswordDeleteError
-from keyring.util import properties
-from keyring.util import XDG
-from keyring.py27compat import unicode_str
+from ..backend import KeyringBackend
+from ..errors import PasswordSetError, PasswordDeleteError
+from ..util import properties
+from ..util import XDG
+from ..py27compat import unicode_str
 
 class Keyring(KeyringBackend):
     """Gnome Keyring"""
@@ -21,7 +21,6 @@ class Keyring(KeyringBackend):
     KEYRING_NAME = None
 
     requisite_vars = [
-        'GNOME_KEYRING_CONTROL',
         'DISPLAY',
         'DBUS_SESSION_BUS_ADDRESS',
     ]
