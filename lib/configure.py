@@ -1,7 +1,8 @@
 import sys, re
 import xbmc, xbmcgui
 import passwordStorage
-from passwordStorage import xbmcutil, internalGetpass, errors
+from internal import xbmcutil, errors
+from internal import getpass as internalGetpass
 
 T = xbmcutil.ADDON.getLocalizedString
 
@@ -124,13 +125,11 @@ def changeKey():
 		xbmcgui.Dialog().ok(T(32030),T(32031))
 
 def storeKey(store=True,kr=None):
-	import passwordStorage
 	keyring = passwordStorage.getKeyring()
 	kr = kr or keyring.get_keyring()
 	if store:
 		if hasattr(kr,'change_keyring_password'):
-			from lib.internal import getRandomKey
-			keyring_key = getRandomKey()
+			keyring_key = internalGetpass.getRandomKey()
 			try:
 				keyring_key = kr.change_keyring_password(keyring_key)
 			except ValueError, e:

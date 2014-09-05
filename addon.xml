@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="script.module.password.storage" name="Password Storage" version="0.1.6" provider-name="Rick Phillips (ruuk)">
+<addon id="script.module.password.storage" name="Password Storage" version="0.1.7" provider-name="Rick Phillips (ruuk)">
 	<requires>
 		<import addon="xbmc.python" version="2.1.0" />
 	</requires>
-	<extension point="xbmc.python.script" library="main.py">
+	<extension point="xbmc.python.script" library="lib/configure.py">
 		<provides>executable</provides>
 	</extension>
 	<extension point="xbmc.python.module" library="lib" />

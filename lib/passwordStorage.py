@@ -1,5 +1,6 @@
 import xbmc, xbmcaddon, sys
-from internal import internalGetpass, xbmcutil, errors # analysis:ignore
+from internal import xbmcutil, errors
+from internal import getpass as internalGetpass
 
 DEBUG = True
 LAST_ERROR = ''
@@ -185,8 +186,8 @@ def encrypt(identifier,data):
 	The returned encrypted data is hex encoded.
 	"""
 	identifier += '_DATA_KEY' #To avoid collisions with usernames
-	from internal.Internal import getRandomKey, encrypt
-	key = getRandomKey()
+	from internal.Internal import encrypt
+	key = internalGetpass.getRandomKey()
 	store(identifier,key)
 	return encrypt(key,data)
 	

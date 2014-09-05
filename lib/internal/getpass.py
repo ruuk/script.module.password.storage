@@ -1,5 +1,5 @@
 import xbmcgui, hashlib
-from internal import xbmcutil
+import xbmcutil
 
 state = None
 

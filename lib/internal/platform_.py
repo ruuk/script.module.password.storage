@@ -1,6 +1,6 @@
 import appdirs
 import xbmc
-from internal import xbmcutil
+import xbmcutil
 
 def data_root():
 	if xbmc.getCondVisibility('System.Platform.Android'):

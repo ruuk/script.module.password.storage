@@ -2,7 +2,7 @@ import aes, pyDes, hashlib, os, binascii
 import properties
 import json, abc
 import platform_
-from internal import xbmcutil, errors
+import xbmcutil, errors
 
 def LOG(msg):
 	print 'script.module.password.storage: ' + msg
