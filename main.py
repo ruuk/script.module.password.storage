@@ -1,14 +1,16 @@
 import sys, re
-import xbmc, xbmcgui, xbmcaddon
+import xbmc, xbmcgui
+import passwordStorage
+from passwordStorage import xbmcutil, internalGetpass, errors
 
-ADDON = xbmcaddon.Addon()
-T = ADDON.getLocalizedString
+T = xbmcutil.ADDON.getLocalizedString
 
 class MainWindow(xbmcgui.WindowXML):
 	def onInit(self):
 		self.infoDisplay = self.getControl(100)
 		self.errorsButton = self.getControl(201)
 		self.optionsButton = self.getControl(200)
+		self.resetButton = self.getControl(202)
 		self.updateDisplay()
 	
 	def onClick(self,controlID):
@@ -16,14 +18,27 @@ class MainWindow(xbmcgui.WindowXML):
 			self.keyringOptions()
 		elif controlID == 201:
 			self.openErrorsWindow()
+		elif controlID == 202:
+			self.resetKeyring()
 			
 	def openErrorsWindow(self):
-		w = ErrorWindow('password-storage-text.xml' , xbmc.translatePath(ADDON.getAddonInfo('path')), 'Main',errors=self.errors)
+		w = ErrorWindow('password-storage-text.xml' , xbmc.translatePath(xbmcutil.ADDON.getAddonInfo('path')), 'Main',errors=self.errors)
 		w.doModal()
 		del w
 	
+	def resetKeyring(self):
+		if not xbmcutil.yesNoDialog(T(32035),T(32036),T(32037),T(32035)): return
+		
+		internalGetpass.clearKeyMemory()
+		
+		keyring = passwordStorage.getKeyring()
+		kr = keyring.get_keyring()
+		kr.reset()
+		
+		passwordStorage.saveKeyToDisk()
+		self.updateDisplay()
+
 	def updateDisplay(self):
-		import passwordStorage  # @UnresolvedImport
 		keyringName = passwordStorage.getKeyringName()
 		text =	'{0}: [COLOR FF66AAFF]{1}[/COLOR][CR][CR]'.format(T(32000),xbmc.getCondVisibility('System.Platform.Android') and 'android' or sys.platform)
 		text +=	'{0}: [COLOR FF66AAFF]{1}[/COLOR]'.format(T(32001),keyringName)
@@ -56,10 +71,10 @@ class MainWindow(xbmcgui.WindowXML):
 		self.errorsButton.setEnabled(bool(self.errors))
 		if not keyringName.startswith('Internal'): self.optionsButton.setLabel(T(32033))
 		self.optionsButton.setEnabled(keyringName.startswith('Internal'))
+		self.resetButton.setEnabled(keyringName.startswith('Internal'))
 	
 	def keyringOptions(self):
-		print repr(ADDON.getSetting('keyring_password'))
-		stored = bool(ADDON.getSetting('keyring_password'))
+		stored = bool(xbmcutil.ADDON.getSetting('keyring_password'))
 		if stored:
 			store = T(32012)
 		else:
@@ -72,7 +87,6 @@ class MainWindow(xbmcgui.WindowXML):
 		elif idx == 1:
 			storeKey(not stored)
 		self.updateDisplay()
-
 			
 class ErrorWindow(xbmcgui.WindowXMLDialog):
 	def __init__(self,*args,**kwargs):
@@ -82,44 +96,58 @@ class ErrorWindow(xbmcgui.WindowXMLDialog):
 		self.getControl(100).setText(self.errors)
 
 def changeKey():
-	from passwordStorage import keyring# @UnresolvedImport
+	keyring = passwordStorage.getKeyring()
 	kr = keyring.get_keyring()
+	
+	key = internalGetpass.getRememberedKey()
+	if key: kr._unlock(key)
+	
 	if hasattr(kr,'change_keyring_password'):
-		xbmcaddon.Addon('script.module.password.storage').setSetting('keyring_password','')
-		password = ''
-		while not password:
-			xbmcgui.Window(10000).setProperty('KEYRING_password','')
-			try:
-				password = kr.change_keyring_password()
-			except ValueError:
-				xbmcgui.Dialog().ok(T(32016),T(32016))
-				continue
-		stored = ADDON.getSetting('keyring_password')
-		if stored:
-			ADDON.setSetting('keyring_password',password)
-		xbmcgui.Window(10000).setProperty('KEYRING_password',password)
+		internalGetpass.saveRememberedState()
+		internalGetpass.clearRememberedKey()
+		
+		try:
+			password = kr.change_keyring_password()
+		except errors.AbortException:
+			internalGetpass.restoreRememberedState()
+			return
+		except ValueError:
+			internalGetpass.restoreRememberedState()
+			xbmcgui.Dialog().ok(T(32016),T(32016))
+			return
+		except:
+			passwordStorage.ERROR('chankeKey(): Unhandled change_keyring_password() error.')
+			internalGetpass.restoreRememberedState()
+			return
+
+		internalGetpass.saveKeyringPass(password)
 		xbmcgui.Dialog().ok(T(32030),T(32031))
 
-def storeKey(store=True):
-	from passwordStorage import keyring, clearKeyMemory# @UnresolvedImport
-	kr = keyring.get_keyring()
+def storeKey(store=True,kr=None):
+	import passwordStorage
+	keyring = passwordStorage.getKeyring()
+	kr = kr or keyring.get_keyring()
 	if store:
 		if hasattr(kr,'change_keyring_password'):
 			from lib.internal import getRandomKey
 			keyring_key = getRandomKey()
-			keyring_key = kr.change_keyring_password(keyring_key)
+			try:
+				keyring_key = kr.change_keyring_password(keyring_key)
+			except ValueError, e:
+				xbmcgui.Dialog().ok('Error','Failed to unlock keyring:','',e.message)
+				return
 			xbmcgui.Window(10000).setProperty('KEYRING_password',keyring_key)
-			ADDON.setSetting('keyring_password',keyring_key)
+			xbmcutil.ADDON.setSetting('keyring_password',keyring_key)
 			xbmcgui.Dialog().ok(T(32017),T(32018))
 	else:
-		clearKeyMemory()
+		passwordStorage.clearKeyMemory()
 		keyring_key = kr.change_keyring_password()
-		ADDON.setSetting('keyring_password','')
+		xbmcutil.ADDON.setSetting('keyring_password','')
 		xbmcgui.Window(10000).setProperty('KEYRING_password',keyring_key)
 		xbmcgui.Dialog().ok(T(32019),T(32020))
 		
 def securityLevel():
-	if ADDON.getSetting('keyring_password'): return 0
+	if xbmcutil.ADDON.getSetting('keyring_password'): return 0
 	password = xbmcgui.Window(10000).getProperty('KEYRING_password')
 	if not password: return -1
 	level = 1
@@ -128,7 +156,7 @@ def securityLevel():
 	return level
 
 def openWindow():
-	w = MainWindow('password-storage-main.xml' , xbmc.translatePath(ADDON.getAddonInfo('path')), 'Main')
+	w = MainWindow('password-storage-main.xml' , xbmc.translatePath(xbmcutil.ADDON.getAddonInfo('path')), 'Main')
 	w.doModal()
 	del w
 	

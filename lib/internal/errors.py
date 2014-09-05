@@ -43,3 +43,7 @@ class ExceptionInfo(object):
         return bool(self.type)
 
     __nonzero__ = __bool__
+
+class AbortException(Exception): pass
+
+class IncorrectKeyringKeyException(ValueError): pass

@@ -1,6 +1,6 @@
 Password Storage Module Changelog
 
-Current Version : 0.1.5
+Current Version : 0.1.6
 
 Tested Platforms:
 
@@ -13,6 +13,13 @@ Tested Platforms:
 	Android - SG Note 3:    Internal.PythonEncryptedKeyring
 	Raspberry Pi (Raspbmc): Internal.PythonEncryptedKeyring
 	iOS:                    NOT TESTED
+
+-- 0.1.6 --
+
+Fix for infinite loop on wrong keyring password entry
+Added RESET KEYRING option to Password Storage manager
+Fixes for display updates when changing password options
+Added and improved dialogs for password retrieval failure
 
 -- 0.1.5 --
 

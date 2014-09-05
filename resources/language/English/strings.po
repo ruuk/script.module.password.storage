@@ -149,3 +149,19 @@ msgstr ""
 msgctxt "#32033"
 msgid "NO KEYRING OPTIONS"
 msgstr ""
+
+msgctxt "#32034"
+msgid "RESET KEYRING"
+msgstr ""
+
+msgctxt "#32035"
+msgid "Are you sure?"
+msgstr ""
+
+msgctxt "#32036"
+msgid "This will return to the default stored keyring password."
+msgstr ""
+
+msgctxt "#32037"
+msgid "This will DELETE ALL your stored passwords!"
+msgstr ""

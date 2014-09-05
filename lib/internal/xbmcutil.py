@@ -1,4 +1,6 @@
-import xbmc, xbmcgui
+import xbmc, xbmcgui, xbmcaddon
+
+ADDON = xbmcaddon.Addon('script.module.password.storage')
 
 ACTION_MOVE_LEFT      = 1
 ACTION_MOVE_RIGHT     = 2
@@ -11,7 +13,7 @@ ACTION_PREVIOUS_MENU  = 10
 
 class RemoteControlPassword(xbmcgui.WindowXMLDialog):
 	def __init__(self,*args,**kwargs):
-		self.password = ''
+		self.password = None
 		self.prompt = kwargs.get('prompt','')
 	
 	def onInit(self):
@@ -51,8 +53,7 @@ class RemoteControlPassword(xbmcgui.WindowXMLDialog):
 		self.updateDisplay()
 		
 def remoteControlPasswordPrompt(prompt=''):
-	import xbmcaddon
-	w = RemoteControlPassword('password-storage-remote_control_password.xml',xbmc.translatePath(xbmcaddon.Addon('script.module.password.storage').getAddonInfo('path')), 'Main',prompt=prompt)
+	w = RemoteControlPassword('password-storage-remote_control_password.xml',xbmc.translatePath(ADDON.getAddonInfo('path')), 'Main',prompt=prompt)
 	w.doModal()
 	password = w.password
 	del w
@@ -61,6 +62,12 @@ def remoteControlPasswordPrompt(prompt=''):
 def passwordPrompt(prompt=''):
 	key = xbmc.Keyboard('',prompt,True)
 	key.doModal()
-	if not key.isConfirmed(): return ''
+	if not key.isConfirmed(): return None
 	password = key.getText()
 	return password
+
+def okDialog(heading,msg1,msg2='',msg3=''):
+	return xbmcgui.Dialog().ok('',msg1,msg2,msg3)
+	
+def yesNoDialog(heading,msg1,msg2='',msg3=''):
+	return xbmcgui.Dialog().yesno('',msg1,msg2,msg3)

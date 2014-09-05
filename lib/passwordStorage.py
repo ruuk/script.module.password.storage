@@ -1,5 +1,5 @@
 import xbmc, xbmcaddon, sys
-from internal import getpass, lazy_getpass, getRememberedKey, xbmcutil, clearKeyMemory, getRandomKey  # analysis:ignore
+from internal import internalGetpass, xbmcutil, errors # analysis:ignore
 
 DEBUG = True
 LAST_ERROR = ''
@@ -17,28 +17,62 @@ def ERROR(msg):
 	traceback.print_exc()
 
 FIRST_RUN = False
-if not xbmcaddon.Addon('script.module.password.storage').getSetting('not_first_run_flag'):
-	xbmcaddon.Addon('script.module.password.storage').setSetting('not_first_run_flag','true')
+if not xbmcutil.ADDON.getSetting('not_first_run_flag'):
+	xbmcutil.ADDON.setSetting('not_first_run_flag','true')
 	FIRST_RUN = True
 	LOG('FIRST RUN')
+		
+keyring = None
+
+def __keyringFallback():
+	import internal as keyring # analysis:ignore
+	if FIRST_RUN: saveKeyToDisk()
+	return keyring
+
+encrypted = True
+
+def getKeyring(): #Use this so we only get the keyring when needed. This avoids unnecessary keyring password prompts when the user enters the incorrect password.
+	global keyring
+	if keyring: return keyring
+	try:
+		import keyring
+	except errors.AbortException:
+		LOG('Keyring import - User aborted keyring unlock!!!')
+	except:
+		ERROR('Error importing keyring')
+		keyring = __keyringFallback()
+		LOG('Backend: %s' % getKeyringName(keyring))
+		return keyring
+	
+	try:
+		if getKeyringName().startswith('file.'):
+			keyring = __keyringFallback() #analysis:ignore
+		else:
+			keyring.set_password('PasswordStorage_TEST','TEST','test')
+			if not keyring.get_password('PasswordStorage_TEST','TEST') == 'test':
+				raise Exception()
+	except errors.AbortException:
+		LOG('At test - User aborted keyring unlock!!!')
+	except errors.IncorrectKeyringKeyException:
+		LOG('User entered bad keyring key')
+	except:
+		ERROR('Keyring failed test - using fallback keyring')
+		keyring = __keyringFallback()
+
+	LOG('Backend: %s' % getKeyringName(keyring))
+	return keyring
 
 def saveKeyToDisk():
+	keyring = getKeyring()
 	kr = keyring.get_keyring()
 	if hasattr(kr,'change_keyring_password'):
-		keyring_key = getRandomKey()
+		keyring_key = internalGetpass.getRandomKey()
 		kr._init_file(keyring_key)
 		keyring_key = kr.change_keyring_password(keyring_key)
-		import xbmcgui
-		xbmcgui.Window(10000).setProperty('KEYRING_password',keyring_key)
-		xbmcaddon.Addon('script.module.password.storage').setSetting('keyring_password',keyring_key)
 		
-try:
-	import keyring
-except:
-	ERROR('TEST')
-	import internal as keyring
-	if FIRST_RUN: saveKeyToDisk()
-	
+		internalGetpass.saveKeyringPass(keyring_key)
+		xbmcutil.ADDON.setSetting('keyring_password',keyring_key)
+
 ###############################################################################
 # Public functions
 ###############################################################################
@@ -50,27 +84,49 @@ def retrieve(username,ask_on_fail=True,ask_msg=None):
 	true (default) then shows a dialog asking for the password
 	If no password is obtained, returns None
 	"""
+	keyring = getKeyring()
 	password = None
 	try:
 		password = keyring.get_password(SERVICE_NAME,username)
+	except errors.AbortException:
+		LOG('retreive() 1 - User aborted keyring unlock!!!')
+		xbmcutil.okDialog('Failed','Keyring remains locked.','','Could not get the Facebook password from the keyring.')
+	except errors.IncorrectKeyringKeyException:
+		LOG('retreive() 1 - User entered incorrect keyring password!!!')	
+		xbmcutil.okDialog('Failed','Incorrect keyring password.','','Could not get the Facebook password from the keyring.')
 	except ValueError:
-		clearKeyMemory()
-		password = keyring.get_password(SERVICE_NAME,username)
+		try:
+			internalGetpass.clearKeyMemory()
+			password = keyring.get_password(SERVICE_NAME,username)
+		except errors.AbortException:
+			LOG('retreive() 2 - User aborted keyring unlock!!!')	
+			xbmcutil.okDialog('Failed','Keyring remains locked.','','Could not get the Facebook password from the keyring.')
+		except errors.IncorrectKeyringKeyException:
+			LOG('retreive() 2 - User entered incorrect keyring password!!!')	
+			xbmcutil.okDialog('Failed','Incorrect keyring password.','','Could not get the Facebook password from the keyring.')
+		except:
+			ERROR('Failed to get password from keyring')
 	except:
 		ERROR('Failed to get password from keyring')
-	if password:
-		return password
-	elif ask_on_fail:
-		msg = ask_msg or xbmcaddon.Addon('script.module.password.storage').getLocalizedString(32024).format(xbmcaddon.Addon(ADDON_ID).getAddonInfo('name'))
+		
+	if password: return password
+		
+	if ask_on_fail:
+		msg = ask_msg or xbmcutil.ADDON.getLocalizedString(32024).format('[B]{0}[/B]'.format(xbmcaddon.Addon(ADDON_ID).getAddonInfo('name')))
 		password = xbmcutil.passwordPrompt(msg)
 		if password: return password
+
+		xbmcutil.okDialog('Failed','Failed to retreive password.')
+
 	return None
 
-def store(username,password):
+def store(username,password,only_if_unlocked=False):
 	"""
 	Save the provided password for the associated username
 	Returns true if the password was successfully saved, otherwise false
 	"""
+	if only_if_unlocked and not internalGetpass.getRememberedKey(): return
+	keyring = getKeyring()
 	try:
 		if not password:
 			try:
@@ -88,9 +144,10 @@ def store(username,password):
 def delete(username_or_identifier,for_data=False):
 	"""
 	Delete the stored password for the associated username from the keyring.
-	Seting for_data=True will delete the key for the identifier from a
+	Setting for_data=True will delete the key for the identifier from a
 	previous data encrypt() call.
 	"""
+	keyring = getKeyring()
 	if for_data: username_or_identifier += '_DATA_KEY'
 	try:
 		keyring.delete_password(SERVICE_NAME,username_or_identifier)
@@ -102,16 +159,17 @@ def delete(username_or_identifier,for_data=False):
 def setAddonID(ID):
 	"""
 	Set the addon ID for which passwords will be stored
-	If this function is not called, it will default use the current addons ID
+	If this function is not called, it will default use the current addon's ID
 	"""
 	global SERVICE_NAME, ADDON_ID
 	ADDON_ID = ID
 	SERVICE_NAME = 'PasswordStorage_%s' % ADDON_ID.replace('.','_')
 	
-def getKeyringName():
+def getKeyringName(keyring=None):
 	"""
 	Returns a somewhat user friendly name of the keyring that is being used
 	"""
+	keyring = keyring or getKeyring()
 	kr = keyring.get_keyring()
 	try:
 		mod = kr.__module__.rsplit('.',1)[-1]
@@ -146,25 +204,6 @@ def decrypt(identifier,encrypted_data):
 	
 # End Public Functions ########################################################
 
-def __keyringFallback():
-	global keyring
-	import internal as keyring # analysis:ignore
-	if FIRST_RUN: saveKeyToDisk()
-
-encrypted = True
-	
-try:
-	if getKeyringName().startswith('file.'):
-		__keyringFallback()
-	else:
-		keyring.set_password('PasswordStorage_TEST','TEST','test')
-		if not keyring.get_password('PasswordStorage_TEST','TEST') == 'test':
-			raise Exception()
-except:
-	ERROR('Keyring failed test - using fallback keyring')
-	__keyringFallback()
-
-LOG('Backend: %s' % getKeyringName())
 LOG('Platform: %s' % (xbmc.getCondVisibility('System.Platform.Android') and 'android' or sys.platform))
 ADDON_ID = None
 SERVICE_NAME = None

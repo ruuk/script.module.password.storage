@@ -1,23 +1,24 @@
 import aes, pyDes, hashlib, os, binascii
 import properties
 import json, abc
-import platform_, errors
+import platform_
+from internal import xbmcutil, errors
 
 def LOG(msg):
 	print 'script.module.password.storage: ' + msg
 	
 try:
-	from getpass import getpass, lazy_getpass, saveKeyringPass, showMessage
+	from getpass import getpass, lazy_getpass, saveKeyringPass, showMessage, clearKeyMemory, getRandomKey
 except ImportError:
 	#For testing
 	from getpass import getpass
 	lazy_getpass = getpass
 	saveKeyringPass = lambda x: len(x)
 	showMessage = LOG
+	def clearKeyMemory(): pass
+	def getRandomKey(): return 'RANDOM_KEY_TEST'
 
-import xbmcaddon
-
-T = xbmcaddon.Addon('script.module.password.storage').getLocalizedString
+T = xbmcutil.ADDON.getLocalizedString
 
 def add_metaclass(metaclass):
 	"""Class decorator for creating a class with a metaclass."""
@@ -30,10 +31,6 @@ def add_metaclass(metaclass):
 		return metaclass(cls.__name__, cls.__bases__, orig_vars)
 	return wrapper
 
-def getRandomKey():
-	import random
-	return hashlib.md5(str(random.randint(0,9999999999999999))).hexdigest()
-	
 class KeyringBackendMeta(abc.ABCMeta):
 	"""
 	A metaclass that's both an ABCMeta and a type that keeps a registry of
@@ -184,11 +181,14 @@ class PythonEncryptedKeyring(BaseKeyring):
 			self._init_file()
 		return self.keyring_key
 
+	def reset(self):
+		if os.path.exists(self.file_path): os.remove(self.file_path)
+		
 	def _init_file(self,keyring_key=None):
 		"""
 		Initialize a new password file and set the reference password.
 		"""
-		self.keyring_key = keyring_key or self._get_new_password()
+		self.keyring_key = keyring_key or self._get_new_password() or ''
 		saveKeyringPass(self.keyring_key)
 		#We create and encrypt and store a secondary key, so the primary key can be changed and all we need to do is decrypt and restore the secondary
 		secondary_key = getRandomKey()
@@ -216,14 +216,18 @@ class PythonEncryptedKeyring(BaseKeyring):
 			return False
 		return True
 	
-	def _unlock(self):
+	def _unlock(self,key=None):
 		"""
 		Unlock this keyring by getting the password for the keyring from the
 		user.
 		"""
-		self.keyring_key = lazy_getpass(T(32025))
+		key = key or lazy_getpass(T(32025))
+		if key == None: raise errors.AbortException('Abort at unlock')
+		self.keyring_key = key
 		passwords_dict = self._read_passwords()
-		if not self._check_reference(passwords_dict): raise ValueError("Incorrect Password")
+		if not self._check_reference(passwords_dict):
+			clearKeyMemory()
+			raise errors.IncorrectKeyringKeyException()
 
 	def _lock(self):
 		"""
@@ -236,12 +240,15 @@ class PythonEncryptedKeyring(BaseKeyring):
 		
 	def change_keyring_password(self,keyring_key=None):
 		passwords_dict = self._read_passwords()
-		key = self._get_secondary_key(passwords_dict)
+		secondary_key = self._get_secondary_key(passwords_dict)
+
 		if keyring_key:
 			self.keyring_key = keyring_key
 		else:
-			self.keyring_key = self._get_new_password()
-		passwords_dict['key'] = self.encrypt(self.keyring_key, key)
+			key = self._get_new_password()
+			if not key: return
+			self.keyring_key = key
+		passwords_dict['key'] = self.encrypt(self.keyring_key, secondary_key)
 		passwords_dict['check'] = self.encrypt(self.keyring_key, self._check)
 		self._write_passwords(passwords_dict)
 		return self.keyring_key
@@ -286,7 +293,9 @@ class PythonEncryptedKeyring(BaseKeyring):
 	def _get_new_password(self):
 		while True:
 			password = getpass(T(32026))
+			if password == None: raise errors.AbortException()
 			confirm = getpass(T(32027),confirm=True)
+			if confirm == None: raise errors.AbortException()
 			if password != confirm:
 				showMessage(T(32028))
 				continue
