@@ -6,8 +6,6 @@ from ..backend import KeyringBackend
 from ..errors import (InitError, PasswordDeleteError,
     ExceptionRaisedContext)
 
-import dbus, dbus.mainloop.glib
-
 try:
     import secretstorage
     import secretstorage.exceptions as exceptions
@@ -15,12 +13,6 @@ except ImportError:
     pass
 
 log = logging.getLogger(__name__)
-
-def getDBusSessionBus():
-    mainloop = dbus.get_default_main_loop()
-    if not mainloop:
-        mainloop = dbus.mainloop.glib.DBusGMainLoop(set_as_default=True)
-    return dbus.SessionBus()
 
 class Keyring(KeyringBackend):
     """Secret Service Keyring"""
@@ -36,7 +28,7 @@ class Keyring(KeyringBackend):
         if not hasattr(secretstorage, 'get_default_collection'):
             raise RuntimeError("SecretStorage 1.0 or newer required")
         try:
-            bus = getDBusSessionBus()
+            bus = secretstorage.dbus_init()
             list(secretstorage.get_all_collections(bus))
         except exceptions.SecretServiceNotAvailableException as e:
             raise RuntimeError(
@@ -44,7 +36,7 @@ class Keyring(KeyringBackend):
         return 5
 
     def get_default_collection(self):
-        bus = getDBusSessionBus()
+        bus = secretstorage.dbus_init()
         try:
             collection = secretstorage.get_default_collection(bus)
         except exceptions.SecretStorageException as e:
