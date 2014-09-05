@@ -126,7 +126,9 @@ def store(username,password,only_if_unlocked=False):
 	Save the provided password for the associated username
 	Returns true if the password was successfully saved, otherwise false
 	"""
-	if only_if_unlocked and not internalGetpass.getRememberedKey(): return
+	if only_if_unlocked:
+		if getKeyringName().startswith('Internal.'):
+			if not internalGetpass.getRememberedKey(): return
 	keyring = getKeyring()
 	try:
 		if not password:

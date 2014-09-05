@@ -41,6 +41,6 @@ def _config_root_Linux():
     return os.path.join(root, 'python_keyring')
 
 if sys.platform.startswith('win'):
-    _config_root_Windows
+    config_root = _config_root_Windows
 else:
     config_root = _config_root_Linux
