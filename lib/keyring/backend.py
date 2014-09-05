@@ -124,8 +124,8 @@ def _load_backend(name):
 
 def _load_backends():
     "ensure that all keyring backends are loaded"
-    backends = ('file', 'Gnome', 'Google', 'keyczar', 'kwallet', 'multi',
-        'OS_X', 'pyfs', 'SecretService', 'Windows')
+    backends = ('Google', 'keyczar', 'kwallet', 'multi',
+        'OS_X', 'pyfs', 'Windows')
     list(map(_load_backend, backends))
 
 @util.once

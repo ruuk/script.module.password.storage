@@ -26,6 +26,7 @@ if not xbmcutil.ADDON.getSetting('not_first_run_flag'):
 keyring = None
 
 def __keyringFallback():
+	LOG('Using fallback keyring')
 	import internal as keyring # analysis:ignore
 	if FIRST_RUN: saveKeyToDisk()
 	return keyring
@@ -46,7 +47,12 @@ def getKeyring(): #Use this so we only get the keyring when needed. This avoids 
 		return keyring
 	
 	try:
-		if getKeyringName().startswith('file.'):
+		keyringName = getKeyringName()
+		if keyringName.startswith('file.') or keyringName.startswith('SecretService.') or keyringName.startswith('Gnome.'):
+			#SecretService and Gnome are broken because of a DBus issue with XBMC - they only work on the first run addon that uses it
+			#I remove them from _load_backends() in backend.py, but have this here in case I forget when updating the keyring core
+			#We don't want any of the file ones because we want to ensure encryption and also handle the dialogs properly for the keyring password
+			LOG('Not using: {0}'.format(keyringName))
 			keyring = __keyringFallback() #analysis:ignore
 		else:
 			keyring.set_password('PasswordStorage_TEST','TEST','test')
@@ -57,7 +63,7 @@ def getKeyring(): #Use this so we only get the keyring when needed. This avoids 
 	except errors.IncorrectKeyringKeyException:
 		LOG('User entered bad keyring key')
 	except:
-		ERROR('Keyring failed test - using fallback keyring')
+		ERROR('Keyring failed test')
 		keyring = __keyringFallback()
 
 	LOG('Backend: %s' % getKeyringName(keyring))
